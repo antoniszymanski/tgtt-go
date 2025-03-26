@@ -36,5 +36,4 @@ Commands:
 Run "tgtt <command> --help" for more information on a command.
 
 tgtt: error: expected one of "init", "schema", "generate"
-
 ```
