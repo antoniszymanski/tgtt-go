@@ -1,0 +1,14 @@
+run:
+  timeout: "5m"
+linters:
+  enable:
+    # https://golangci-lint.run/usage/linters/#enabled-by-default
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    #
+    - gocritic
+    - gosec

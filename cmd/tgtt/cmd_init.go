@@ -1,0 +1,49 @@
+package main
+
+import (
+	"os"
+	"path/filepath"
+
+	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
+	"github.com/goccy/go-yaml"
+)
+
+type cmdInit struct {
+	Path       string `arg:"" type:"path" default:"tgtt.yml"`
+	SchemaPath string `arg:"" type:"path" default:"tgtt.schema.json"`
+	NoSchema   bool   `short:"S"`
+}
+
+func (c *cmdInit) Run() error {
+	var f *os.File
+	var err error
+	if c.Path != "-" {
+		dir := filepath.Dir(c.Path)
+		if err = os.MkdirAll(dir, 0755); err != nil {
+			return err
+		}
+		f, err = os.Create(c.Path)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		if !c.NoSchema {
+			relpath, err := filepath.Rel(dir, c.SchemaPath)
+			if err == nil {
+				c.SchemaPath = relpath
+			}
+		}
+	} else {
+		f = os.Stdout
+	}
+
+	if !c.NoSchema {
+		s := "# yaml-language-server: $schema=" + c.SchemaPath + "\n"
+		_, err = f.WriteString(s)
+		if err != nil {
+			return err
+		}
+	}
+	return yaml.NewEncoder(f).Encode(internal.Config{})
+}
