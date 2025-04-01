@@ -3,11 +3,11 @@ module github.com/antoniszymanski/tgtt-go
 go 1.24.1
 
 require (
-	github.com/alecthomas/kong v1.9.0
+	github.com/alecthomas/kong v1.10.0
 	github.com/antoniszymanski/sanefmt-go v0.1.0
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/fatih/structtag v1.2.0
-	github.com/goccy/go-yaml v1.16.0
+	github.com/goccy/go-yaml v1.17.1
 	github.com/hashicorp/go-set/v3 v3.0.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/lindell/go-ordered-set v1.0.2
