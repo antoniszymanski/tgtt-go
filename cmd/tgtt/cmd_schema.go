@@ -18,14 +18,14 @@ func (c *cmdSchema) Run() error {
 	var f *os.File
 	var err error
 	if c.Path != "-" {
-		if err = os.MkdirAll(filepath.Dir(c.Path), 0755); err != nil {
+		if err = os.MkdirAll(filepath.Dir(c.Path), 0750); err != nil {
 			return err
 		}
 		f, err = os.Create(c.Path)
 		if err != nil {
 			return err
 		}
-		defer f.Close()
+		defer f.Close() //nolint:errcheck
 	} else {
 		f = os.Stdout
 	}

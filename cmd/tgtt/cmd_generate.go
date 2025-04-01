@@ -24,7 +24,7 @@ func (c *cmdGenerate) Run() error {
 		if err != nil {
 			return err
 		}
-		defer f.Close()
+		defer f.Close() //nolint:errcheck
 	} else {
 		f = os.Stdin
 	}

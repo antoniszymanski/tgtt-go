@@ -33,7 +33,7 @@ var tmplSource string
 var tmpl = template.Must(template.New("module").Parse(tmplSource))
 
 func (m *Module) Generate(dir string, middlewares ...Middleware) error {
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0750); err != nil {
 		return err
 	}
 	return m.generate(dir, "index", middlewares, set.New[string](0))

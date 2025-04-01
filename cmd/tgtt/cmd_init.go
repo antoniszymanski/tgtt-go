@@ -19,14 +19,14 @@ func (c *cmdInit) Run() error {
 	var err error
 	if c.Path != "-" {
 		dir := filepath.Dir(c.Path)
-		if err = os.MkdirAll(dir, 0755); err != nil {
+		if err = os.MkdirAll(dir, 0750); err != nil {
 			return err
 		}
 		f, err = os.Create(c.Path)
 		if err != nil {
 			return err
 		}
-		defer f.Close()
+		defer f.Close() //nolint:errcheck
 
 		if !c.NoSchema {
 			relpath, err := filepath.Rel(dir, c.SchemaPath)
