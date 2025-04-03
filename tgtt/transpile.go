@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/fatih/structtag"
 	"github.com/hashicorp/go-set/v3"
 	"github.com/lindell/go-ordered-set/orderedset"
 	"github.com/vishalkuo/bimap"
@@ -167,7 +166,7 @@ func (t *transpiler) transpileTypeName(obj *types.TypeName, mod *Module) {
 	var def string
 	switch typ.Underlying().(type) {
 	case *types.Struct:
-		def = t.transpileStructToplevel(typ, mod)
+		def = t.transpileStruct(typ, mod)
 	default:
 		def = t.transpileToplevel(typ, mod)
 	}
@@ -188,7 +187,7 @@ func (t *transpiler) transpileType(typ types.Type, mod *Module) string {
 	case *types.Map:
 		return t.transpileMap(typ, mod)
 	case *types.Struct:
-		return t.transpileStruct(typ, mod)
+		return t.transpileStructBody(parseStruct(typ), mod)
 	case *types.Alias:
 		return t.transpileAlias(typ, mod)
 	case *types.Named:
@@ -257,62 +256,6 @@ func (t *transpiler) transpileMap(typ *types.Map, mod *Module) string {
 	return fmt.Sprintf(
 		`{ [key in string]: %s }`, t.transpileType(typ.Elem(), mod),
 	)
-}
-
-func (t *transpiler) transpileStruct(typ *types.Struct, mod *Module) string {
-	var sb strings.Builder
-	sb.WriteString("{ ")
-
-	addSpace := true
-	for i := range typ.NumFields() {
-		field := typ.Field(i)
-		if !field.Exported() {
-			continue
-		}
-
-		fieldName, optional := func() (string, bool) {
-			tags, err := structtag.Parse(typ.Tag(i))
-			if err != nil {
-				return "", false
-			}
-
-			tag, err := tags.Get("json")
-			if err != nil {
-				return "", false
-			}
-
-			return tag.Name, tag.HasOption("omitempty")
-		}()
-		if fieldName == "" {
-			if field.Embedded() {
-				continue
-			}
-			fieldName = field.Name()
-		}
-		if fieldName == "-" {
-			continue
-		}
-
-		format := `%s: %s; `
-		if optional {
-			format = `%s?: %s; `
-		}
-
-		fmt.Fprintf(
-			&sb,
-			format,
-			strconv.Quote(fieldName),
-			t.transpileType(field.Type(), mod),
-		)
-		addSpace = false
-	}
-
-	if addSpace {
-		sb.WriteString(" ")
-	}
-	sb.WriteString("}")
-
-	return sb.String()
 }
 
 func (t *transpiler) transpileAlias(typ *types.Alias, mod *Module) string {

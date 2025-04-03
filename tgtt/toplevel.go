@@ -3,9 +3,6 @@ package tgtt
 import (
 	"fmt"
 	"go/types"
-	"strings"
-
-	"github.com/fatih/structtag"
 )
 
 // TODO: name
@@ -13,60 +10,6 @@ type topLevel interface {
 	Underlying() types.Type
 	TypeParams() *types.TypeParamList
 	Obj() *types.TypeName
-}
-
-func (t *transpiler) transpileStructToplevel(typ topLevel, mod *Module) string {
-	tparams := t.transpileTypeParams(typ.TypeParams(), mod)
-
-	path := t.getPkgPath(typ.Obj())
-	_, ok := t.TypeMappings[path]
-	if ok {
-		return fmt.Sprintf(
-			`export type %s%s = %s`,
-			typ.Obj().Name(), tparams, t.TypeMappings[path],
-		)
-	}
-	typStr := t.transpileStruct(typ.Underlying().(*types.Struct), mod)
-
-	extends := t.transpileExtends(typ.Underlying().(*types.Struct), mod)
-	if len(extends) > 0 {
-		extends = " " + extends
-	}
-
-	return fmt.Sprintf(
-		`export interface %s%s%s %s`,
-		typ.Obj().Name(), tparams, extends, typStr,
-	)
-}
-
-func (t *transpiler) transpileExtends(typ *types.Struct, mod *Module) string {
-	var extends []string
-	for i := range typ.NumFields() {
-		field := typ.Field(i)
-		skip := func() bool {
-			if !field.Exported() || !field.Embedded() {
-				return true
-			}
-
-			tags, err := structtag.Parse(typ.Tag(i))
-			if err != nil {
-				return false
-			}
-
-			_, err = tags.Get("json")
-			return err == nil
-		}()
-		if skip {
-			continue
-		}
-
-		extends = append(extends, t.transpileType(field.Type(), mod))
-	}
-
-	if len(extends) == 0 {
-		return ""
-	}
-	return "extends " + strings.Join(extends, ", ")
 }
 
 func (t *transpiler) transpileToplevel(typ topLevel, mod *Module) string {
