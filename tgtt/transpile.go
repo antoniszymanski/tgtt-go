@@ -205,12 +205,36 @@ func (t *transpiler) transpileType(typ types.Type, mod *Module) string {
 }
 
 func (t *transpiler) transpileBasic(typ *types.Basic, _ *Module) string {
-	switch {
-	case typ.Kind() == types.Bool:
+	switch typ.Kind() {
+	case types.Bool:
 		return "boolean"
-	case types.Int <= typ.Kind() && typ.Kind() <= types.Float64:
-		return "number"
-	case typ.Kind() == types.String:
+	case types.Int:
+		return "number" + comment("int")
+	case types.Int8:
+		return "number" + comment("int8")
+	case types.Int16:
+		return "number" + comment("int16")
+	case types.Int32:
+		return "number" + comment("int32")
+	case types.Int64:
+		return "number" + comment("int64")
+	case types.Uint:
+		return "number" + comment("uint")
+	case types.Uint8:
+		return "number" + comment("uint8")
+	case types.Uint16:
+		return "number" + comment("uint16")
+	case types.Uint32:
+		return "number" + comment("uint32")
+	case types.Uint64:
+		return "number" + comment("uint64")
+	case types.Uintptr:
+		return "number" + comment("uintptr")
+	case types.Float32:
+		return "number" + comment("float32")
+	case types.Float64:
+		return "number" + comment("float64")
+	case types.String:
 		return "string"
 	default:
 		return "any"
