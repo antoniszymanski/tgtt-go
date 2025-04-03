@@ -320,7 +320,7 @@ func (t *transpiler) transpileAlias(typ *types.Alias, mod *Module) string {
 
 func (t *transpiler) transpileNamed(typ *types.Named, mod *Module) string {
 	if typ.Obj().Pkg() == nil && typ.Obj().Name() == "comparable" {
-		return "string | number | symbol" + comment("comparable")
+		return "string | number" + comment("comparable")
 	}
 	return t.transpileTypeArgs(typ, mod)
 }
