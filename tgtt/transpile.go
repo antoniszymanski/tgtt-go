@@ -268,7 +268,7 @@ func (t *transpiler) transpileStruct(typ *types.Struct, mod *Module) string {
 	addSpace := true
 	for i := range typ.NumFields() {
 		field := typ.Field(i)
-		if !field.Exported() || field.Embedded() {
+		if !field.Exported() {
 			continue
 		}
 
@@ -286,6 +286,9 @@ func (t *transpiler) transpileStruct(typ *types.Struct, mod *Module) string {
 			return tag.Name, tag.HasOption("omitempty")
 		}()
 		if fieldName == "" {
+			if field.Embedded() {
+				continue
+			}
 			fieldName = field.Name()
 		}
 		if fieldName == "-" {

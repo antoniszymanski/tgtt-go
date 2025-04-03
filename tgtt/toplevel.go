@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"go/types"
 	"strings"
+
+	"github.com/fatih/structtag"
 )
 
 // TODO: name
@@ -39,8 +41,22 @@ func (t *transpiler) transpileStructToplevel(typ topLevel, mod *Module) string {
 
 func (t *transpiler) transpileExtends(typ *types.Struct, mod *Module) string {
 	var extends []string
-	for field := range typ.Fields() {
-		if !field.Exported() || !field.Embedded() {
+	for i := range typ.NumFields() {
+		field := typ.Field(i)
+		skip := func() bool {
+			if !field.Exported() || !field.Embedded() {
+				return true
+			}
+
+			tags, err := structtag.Parse(typ.Tag(i))
+			if err != nil {
+				return false
+			}
+
+			_, err = tags.Get("json")
+			return err == nil
+		}()
+		if skip {
 			continue
 		}
 
