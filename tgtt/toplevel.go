@@ -13,7 +13,6 @@ type topLevel interface {
 }
 
 func (t *transpiler) transpileToplevel(typ topLevel, mod *Module) string {
-	tparams := t.transpileTypeParams(typ.TypeParams(), mod)
 	var typStr string
 	var ok bool
 	if typStr, ok = t.TypeMappings[t.getPkgPath(typ.Obj())]; !ok {
@@ -22,7 +21,9 @@ func (t *transpiler) transpileToplevel(typ topLevel, mod *Module) string {
 
 	return fmt.Sprintf(
 		`export type %s%s = %s`,
-		typ.Obj().Name(), tparams, typStr,
+		typ.Obj().Name(),
+		t.transpileTypeParams(typ.TypeParams(), mod),
+		typStr,
 	)
 }
 
