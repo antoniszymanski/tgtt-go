@@ -255,9 +255,7 @@ func (t *transpiler) transpileSlice(typ *types.Slice, mod *Module) string {
 
 func (t *transpiler) transpileMap(typ *types.Map, mod *Module) string {
 	return fmt.Sprintf(
-		`{ [key in %s]: %s }`,
-		t.transpileType(typ.Key(), mod),
-		t.transpileType(typ.Elem(), mod),
+		`{ [key in string]: %s }`, t.transpileType(typ.Elem(), mod),
 	)
 }
 
