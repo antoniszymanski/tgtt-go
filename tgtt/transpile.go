@@ -303,7 +303,7 @@ func (t *transpiler) transpileStruct(typ *types.Struct, mod *Module) string {
 		fmt.Fprintf(
 			&sb,
 			format,
-			fieldName,
+			strconv.Quote(fieldName),
 			t.transpileType(field.Type(), mod),
 		)
 		addSpace = false
