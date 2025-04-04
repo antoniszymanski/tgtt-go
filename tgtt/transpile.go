@@ -241,7 +241,11 @@ func (t *transpiler) transpileBasic(typ *types.Basic, _ *Module) string {
 }
 
 func (t *transpiler) transpilePointer(typ *types.Pointer, mod *Module) string {
-	return t.transpileType(typ.Elem(), mod)
+	typStr := t.transpileType(typ.Elem(), mod)
+	if !strings.HasSuffix(typStr, " | null") {
+		typStr += " | null"
+	}
+	return typStr
 }
 
 func (t *transpiler) transpileArray(typ *types.Array, mod *Module) string {

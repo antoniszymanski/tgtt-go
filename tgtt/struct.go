@@ -35,7 +35,12 @@ func (t *transpiler) transpileStruct(typ topLevel, mod *Module) string {
 func (t *transpiler) transpileExtends(s structData, mod *Module) string {
 	var extends []string
 	for _, field := range s.Embedded {
-		extends = append(extends, t.transpileType(field.Type, mod))
+		typStr := t.transpileType(field.Type, mod)
+		typStr, found := strings.CutSuffix(typStr, " | null")
+		if found {
+			typStr = fmt.Sprintf(`Partial<%s>`, typStr)
+		}
+		extends = append(extends, typStr)
 	}
 
 	if len(extends) == 0 {
