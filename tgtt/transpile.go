@@ -274,19 +274,44 @@ func (t *transpiler) transpileNamed(typ *types.Named, mod *Module) string {
 }
 
 func (t *transpiler) transpileInterface(typ *types.Interface, mod *Module) string {
-	var u *types.Union
-	var ok bool
-	for i := typ.NumEmbeddeds() - 1; i >= 0; i-- {
-		u, ok = typ.EmbeddedType(i).(*types.Union)
-		if ok {
-			break
+	intersect := func(a, b []types.Type) []types.Type {
+		var dest []types.Type
+		for _, x := range a {
+			for _, y := range b {
+				if types.Identical(x, y) {
+					dest = append(dest, x)
+				}
+			}
 		}
+		return dest
 	}
 
-	if u == nil {
+	var unions [][]types.Type
+	for e := range typ.EmbeddedTypes() {
+		if u, ok := e.(*types.Union); ok {
+			var terms []types.Type
+			for term := range u.Terms() {
+				terms = append(terms, term.Type())
+			}
+			terms = slices.CompactFunc(terms, types.Identical)
+		} else {
+			unions = append(unions, []types.Type{e})
+		}
+	}
+	if len(unions) == 0 {
 		return "any"
 	}
-	return t.transpileUnion(u, mod)
+
+	x := unions[0]
+	for _, y := range unions[1:] {
+		x = intersect(x, y)
+	}
+
+	terms := orderedset.New[string]()
+	for _, termTyp := range x {
+		terms.Add(t.transpileType(termTyp, mod))
+	}
+	return strings.Join(terms.Values(), " | ")
 }
 
 func (t *transpiler) transpileUnion(typ *types.Union, mod *Module) string {
