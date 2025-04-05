@@ -302,13 +302,12 @@ func (t *transpiler) transpileInterface(typ *types.Interface, mod *Module) strin
 		return "any"
 	}
 
-	x := unions[0]
 	for _, y := range unions[1:] {
-		x = intersect(x, y)
+		unions[0] = intersect(unions[0], y)
 	}
 
 	terms := orderedset.New[string]()
-	for _, termTyp := range x {
+	for _, termTyp := range unions[0] {
 		terms.Add(t.transpileType(termTyp, mod))
 	}
 	return strings.Join(terms.Values(), " | ")
