@@ -4,6 +4,8 @@ github.com/alecthomas/kong v1.10.0 h1:8K4rGDpT7Iu+jEXCIJUeKqvpwZHbsFRoebLbnzlmrp
 github.com/alecthomas/kong v1.10.0/go.mod h1:p2vqieVMeTAnaC83txKtXe8FLke2X07aruPWXyMPQrU=
 github.com/alecthomas/repr v0.4.0 h1:GhI2A8MACjfegCPVq9f1FLvIBS+DrQ2KQBFZP1iFzXc=
 github.com/alecthomas/repr v0.4.0/go.mod h1:Fr0507jx4eOXV7AlPV6AVZLYrLIuIeSOWtW57eE/O/4=
+github.com/antoniszymanski/bimap-go v0.1.0 h1:toC/roa74KvmV6SkmHtlFueJYYoOPAGkL0bfrwG4K4k=
+github.com/antoniszymanski/bimap-go v0.1.0/go.mod h1:WlLryEgFvO1VUWhd5WJ60uk+gw+cHE7Gnu0bsGY7vgs=
 github.com/antoniszymanski/mapcomments-go v0.1.0 h1:VTIE0zu9yhhpS1uW0PzuYNAWi/b/EvcfS1vmAi/Wuus=
 github.com/antoniszymanski/mapcomments-go v0.1.0/go.mod h1:zw1mlEK7WYGBotYpM2S1rzYyLDvTGdxQ4iMKtHr//rE=
 github.com/antoniszymanski/sanefmt-go v0.1.0 h1:q0kjn9mdJn72aJ4RJoMvtVZE0fXZyuBzGB5j8LdDrlU=
@@ -41,8 +43,6 @@ github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKs
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/tetratelabs/wazero v1.9.0 h1:IcZ56OuxrtaEz8UYNRHBrUa9bYeX9oVY93KspZZBf/I=
 github.com/tetratelabs/wazero v1.9.0/go.mod h1:TSbcXCfFP0L2FGkRPxHphadXPjo1T6W+CseNNY7EkjM=
-github.com/vishalkuo/bimap v0.0.0-20230830142743-a9fb9b52066c h1:KEcyvVSSrD/dq45OZpwFG7/gi608xzyriB8kgquCgPU=
-github.com/vishalkuo/bimap v0.0.0-20230830142743-a9fb9b52066c/go.mod h1:oVZgsxuZOVCkAVcgSitAfucCKX0Ani+R8bIbfGdqAkg=
 github.com/wk8/go-ordered-map/v2 v2.1.8 h1:5h/BUHu93oj4gIdvHHHGsScSTMijfx5PeYkE/fJgbpc=
 github.com/wk8/go-ordered-map/v2 v2.1.8/go.mod h1:5nJHM5DyteebpVlHnWMV0rPz6Zp7+xBAnxjb1X5vnTw=
 golang.org/x/mod v0.24.0 h1:ZfthKaKaT4NrhGVZHO1/WDTwGES4De8KtWO0SIbNJMU=

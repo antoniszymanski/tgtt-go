@@ -10,15 +10,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/antoniszymanski/bimap-go"
 	"github.com/hashicorp/go-set/v3"
 	"github.com/lindell/go-ordered-set/orderedset"
-	"github.com/vishalkuo/bimap"
 	"golang.org/x/tools/go/packages"
 )
 
 type transpiler struct {
 	pkg          *packages.Package
-	pkgNames     *bimap.BiMap[string, string]
+	pkgNames     bimap.BiMap[string, string]
 	Modules      map[string]*Module
 	TypeMappings map[string]string
 }
@@ -26,7 +26,7 @@ type transpiler struct {
 func NewTranspiler(pkg *packages.Package) *transpiler {
 	return &transpiler{
 		pkg:      pkg,
-		pkgNames: bimap.NewBiMap[string, string](),
+		pkgNames: bimap.New[string, string](0),
 		Modules: map[string]*Module{
 			"index": NewModule(pkg.PkgPath),
 		},

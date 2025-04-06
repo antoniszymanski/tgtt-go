@@ -1,9 +1,10 @@
 module github.com/antoniszymanski/tgtt-go
 
-go 1.24.1
+go 1.24.2
 
 require (
 	github.com/alecthomas/kong v1.10.0
+	github.com/antoniszymanski/bimap-go v0.1.0
 	github.com/antoniszymanski/sanefmt-go v0.1.0
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/fatih/structtag v1.2.0
@@ -11,7 +12,6 @@ require (
 	github.com/hashicorp/go-set/v3 v3.0.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/lindell/go-ordered-set v1.0.2
-	github.com/vishalkuo/bimap v0.0.0-20230830142743-a9fb9b52066c
 	golang.org/x/tools v0.31.0
 )
 

@@ -66,12 +66,12 @@ func (t *transpiler) include(root *Module, tpkg *types.Package, objName string) 
 }
 
 func (t *transpiler) getPkgName(pkg *types.Package) string {
-	if name, ok := t.pkgNames.Get(pkg.Path()); ok {
+	if name, ok := t.pkgNames.Lookup(pkg.Path()); ok {
 		return name
 	}
 
 	nameExists := func(name string) bool {
-		return t.pkgNames.ExistsInverse(name) ||
+		return t.pkgNames.HasInverse(name) ||
 			t.pkg.Types.Scope().Lookup(name) != nil ||
 			t.pkg.Types.Name() == name
 	}
@@ -79,7 +79,7 @@ func (t *transpiler) getPkgName(pkg *types.Package) string {
 	for i := uint64(1); nameExists(name); i++ {
 		name = pkg.Name() + strconv.FormatUint(i, 10)
 	}
-	t.pkgNames.Insert(pkg.Path(), name)
+	t.pkgNames.Set(pkg.Path(), name)
 	return name
 }
 
