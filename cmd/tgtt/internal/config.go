@@ -1,8 +1,14 @@
+/*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/
+
 package internal
 
 import "github.com/hashicorp/go-set/v3"
 
-//go:generate go tool mapcomments-go github.com/antoniszymanski/tgtt-go/cmd/tgtt/config . -P internal
+//go:generate go tool mapcomments-go github.com/antoniszymanski/tgtt-go/cmd/tgtt/config . -P internal --mpl2
 type Config struct {
 	Format       bool              `yaml:"format"`
 	TypeMappings map[string]string `yaml:"type_mappings"`
