@@ -7,7 +7,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 package tgtt
 
 import (
-	"errors"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
@@ -26,7 +25,7 @@ func LoadPackage(pattern string) (*packages.Package, error) {
 		return nil, err
 	}
 
-	if err = pkgError(pkgs[0]); err != nil {
+	if err = newPackageError(pkgs[0]); err != nil {
 		return nil, err
 	}
 
@@ -34,20 +33,44 @@ func LoadPackage(pattern string) (*packages.Package, error) {
 	return pkgs[0], nil
 }
 
-// Based on [packages.PrintErrors]
-func pkgError(pkg *packages.Package) error {
-	var sb strings.Builder
-	for _, err := range pkg.Errors {
-		sb.WriteString(err.Error() + "\n")
-	}
-
-	// Print pkg.Module.Error once if present.
-	if pkg.Module != nil && pkg.Module.Error != nil {
-		sb.WriteString(pkg.Module.Error.Err + "\n")
-	}
-
-	if sb.Len() == 0 {
+func newPackageError(pkg *packages.Package) error {
+	if len(pkg.Errors) == 0 && (pkg.Module == nil || pkg.Module.Error == nil) {
 		return nil
 	}
-	return errors.New(sb.String())
+
+	var err PackageError
+	err.Errors = pkg.Errors
+	if pkg.Module != nil && pkg.Module.Error != nil {
+		err.ModuleError = pkg.Module.Error
+	}
+	return err
+}
+
+type PackageError struct {
+	Errors      []packages.Error
+	ModuleError *packages.ModuleError
+}
+
+// Based on [packages.PrintErrors]
+func (err PackageError) Error() string {
+	var sb strings.Builder
+
+	for _, pkgErr := range err.Errors {
+		sb.WriteString(pkgErr.Error())
+		sb.WriteString("\n")
+	}
+	if err.ModuleError != nil {
+		sb.WriteString(err.ModuleError.Err)
+		sb.WriteString("\n")
+	}
+
+	return strings.TrimSuffix(sb.String(), "\n")
+}
+
+func (err PackageError) Unwrap() []error {
+	pkgErrs := make([]error, 0, len(err.Errors))
+	for _, pkgErr := range err.Errors {
+		pkgErrs = append(pkgErrs, pkgErr)
+	}
+	return pkgErrs
 }
