@@ -10,8 +10,6 @@ import (
 )
 
 func (t *transpiler) transpileStruct(typ topLevel, mod *Module) string {
-	s := parseStruct(typ.Underlying().(*types.Struct))
-
 	path := t.getPkgPath(typ.Obj())
 	_, ok := t.TypeMappings[path]
 	if ok {
@@ -23,6 +21,7 @@ func (t *transpiler) transpileStruct(typ topLevel, mod *Module) string {
 		)
 	}
 
+	s := parseStruct(typ.Underlying().(*types.Struct))
 	return fmt.Sprintf(
 		`export interface %s%s%s %s`,
 		typ.Obj().Name(),
