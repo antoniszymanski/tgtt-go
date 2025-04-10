@@ -288,15 +288,16 @@ func (t *transpiler) transpileInterface(typ *types.Interface, mod *Module) strin
 
 	var unions [][]types.Type
 	for e := range typ.EmbeddedTypes() {
+		var terms []types.Type
 		if u, ok := e.(*types.Union); ok {
-			var terms []types.Type
 			for term := range u.Terms() {
 				terms = append(terms, term.Type())
 			}
 			terms = slices.CompactFunc(terms, types.Identical)
 		} else {
-			unions = append(unions, []types.Type{e})
+			terms = []types.Type{e}
 		}
+		unions = append(unions, terms)
 	}
 	if len(unions) == 0 {
 		return "any"
