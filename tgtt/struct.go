@@ -11,13 +11,13 @@ import (
 
 func (t *transpiler) transpileStruct(typ topLevel, mod *Module) string {
 	path := t.getPkgPath(typ.Obj())
-	_, ok := t.TypeMappings[path]
+	typeMapping, ok := t.TypeMappings[path]
 	if ok {
 		return fmt.Sprintf(
 			`export type %s%s = %s`,
 			typ.Obj().Name(),
 			t.transpileTypeParams(typ.TypeParams(), mod),
-			t.TypeMappings[path],
+			typeMapping,
 		)
 	}
 

@@ -13,9 +13,9 @@ type topLevel interface {
 }
 
 func (t *transpiler) transpileToplevel(typ topLevel, mod *Module) string {
-	var typStr string
-	var ok bool
-	if typStr, ok = t.TypeMappings[t.getPkgPath(typ.Obj())]; !ok {
+	path := t.getPkgPath(typ.Obj())
+	typStr, ok := t.TypeMappings[path]
+	if !ok {
 		typStr = t.transpileType(typ.Underlying(), mod)
 	}
 
