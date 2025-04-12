@@ -137,5 +137,4 @@ func (m *Module) emitTS(state *state, key string) {
 	}
 
 	state.err = state.write(key, data)
-	return
 }
