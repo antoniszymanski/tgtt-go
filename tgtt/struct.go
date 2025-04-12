@@ -40,6 +40,9 @@ func (t *transpiler) transpileStruct(typ topLevel, mod *Module) string {
 func (t *transpiler) transpileExtends(s structData, mod *Module) string {
 	var extends []string
 	for _, field := range s.Embedded {
+		if _, ok := field.Type.Underlying().(*types.Struct); !ok {
+			continue
+		}
 		typStr := t.transpileType(field.Type, mod)
 		typStr, found := strings.CutSuffix(typStr, " | null")
 		if found {
