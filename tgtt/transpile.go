@@ -7,7 +7,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 package tgtt
 
 import (
-	"cmp"
 	"fmt"
 	"go/constant"
 	"go/types"
@@ -62,7 +61,7 @@ func sortedDefs(pkg *packages.Package) []types.Object {
 	slices.SortFunc(
 		defs,
 		func(a, b types.Object) int {
-			return cmp.Compare(a.Pos(), b.Pos())
+			return strings.Compare(a.Name(), b.Name())
 		},
 	)
 	return defs
@@ -73,9 +72,12 @@ func isTranspilable(obj types.Object) bool {
 		return false
 	}
 	// https://github.com/golang/example/tree/master/gotypes#objects
-	switch obj.(type) {
-	case *types.Const, *types.TypeName:
-		return true
+	switch obj := obj.(type) {
+	case *types.Const:
+		return constant.Val(obj.Val()) != nil
+	case *types.TypeName:
+		_, ok := obj.Type().(topLevel)
+		return ok
 	default:
 		return false
 	}
