@@ -41,7 +41,7 @@ func (c *cmdGenerate) Run() error {
 		return err
 	}
 
-	var middlewares []tgtt.Middleware
+	var middlewares []tgtt.MiddlewareFunc
 	if cfg.Format {
 		middlewares = append(
 			middlewares,
@@ -66,7 +66,7 @@ func (c *cmdGenerate) Run() error {
 		maps.Copy(t.TypeMappings, pkgCfg.TypeMappings)
 		t.Transpile(pkgCfg.Names)
 
-		err = t.Index().Generate(pkgCfg.OutputPath, middlewares...)
+		err = t.Index().WriteTS(pkgCfg.OutputPath, middlewares...)
 		if err != nil {
 			return err
 		}

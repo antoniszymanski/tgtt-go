@@ -11,6 +11,7 @@ import (
 	_ "embed"
 	"os"
 	"path/filepath"
+	"sync"
 	"text/template"
 
 	"github.com/elliotchance/orderedmap/v3"
@@ -23,7 +24,7 @@ type Module struct {
 	Defs    *orderedmap.OrderedMap[string, string]
 }
 
-type Middleware = func([]byte) ([]byte, error)
+type MiddlewareFunc func([]byte) ([]byte, error)
 
 func NewModule(goPath string) *Module {
 	return &Module{
@@ -38,85 +39,103 @@ var tmplSource string
 
 var tmpl = template.Must(template.New("module").Parse(tmplSource))
 
-func (m *Module) Generate(dir string, middlewares ...Middleware) error {
-	if err := os.MkdirAll(dir, 0750); err != nil {
-		return err
-	}
-	return m.generate(dir, "index", middlewares, set.New[string](0))
+type state struct {
+	wg          sync.WaitGroup
+	err         error
+	middlewares []MiddlewareFunc
+	mustSkip    func(key string) bool
+	write       func(key string, data []byte) error
 }
 
-func (m *Module) generate(
-	dir, name string,
-	middlewares []Middleware,
-	generated *set.Set[string],
-) error {
-	if generated.Contains(name) {
+func (m *Module) WriteTS(outputDir string, middlewares ...MiddlewareFunc) error {
+	if err := os.MkdirAll(outputDir, 0750); err != nil {
+		return err
+	}
+
+	s := state{middlewares: middlewares}
+	//
+	writtenFiles := set.New[string](0)
+	var mu sync.Mutex
+	s.mustSkip = func(key string) bool {
+		if s.err != nil {
+			return true
+		}
+		mu.Lock()
+		notExists := writtenFiles.Insert(key)
+		mu.Unlock()
+		return !notExists
+	}
+	//
+	s.write = func(key string, data []byte) error {
+		return os.WriteFile(
+			filepath.Join(outputDir, key+".ts"), data, 0600,
+		)
+	}
+
+	m.queueTS(&s, "index")
+	s.wg.Wait()
+	return s.err
+}
+
+func (m *Module) GenerateTS(middlewares ...MiddlewareFunc) (map[string][]byte, error) {
+	s := state{middlewares: middlewares}
+	tsFiles := make(map[string][]byte)
+	var mu sync.Mutex
+	//
+	s.mustSkip = func(key string) bool {
+		if s.err != nil {
+			return true
+		}
+		mu.Lock()
+		_, exists := tsFiles[key]
+		tsFiles[key] = nil
+		mu.Unlock()
+		return exists
+	}
+	//
+	s.write = func(key string, data []byte) error {
+		mu.Lock()
+		tsFiles[key] = data
+		mu.Unlock()
 		return nil
 	}
 
+	m.queueTS(&s, "index")
+	s.wg.Wait()
+	return tsFiles, s.err
+}
+
+func (m *Module) queueTS(state *state, key string) {
+	state.wg.Add(1)
+	go m.emitTS(state, key)
+
+	for key, imported := range m.Imports.AllFromFront() {
+		go imported.queueTS(state, key)
+	}
+}
+
+func (m *Module) emitTS(state *state, key string) {
+	defer state.wg.Done()
+	if state.mustSkip(key) {
+		return
+	}
+
 	var buf bytes.Buffer
-	var err error
-	if err = tmpl.Execute(&buf, m); err != nil {
-		return err
-	}
-
-	data := buf.Bytes()
-	for _, m := range middlewares {
-		data, err = m(data)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = os.WriteFile(filepath.Join(dir, name+".ts"), data, 0600)
+	err := tmpl.Execute(&buf, m)
 	if err != nil {
-		return err
-	}
-
-	for name, i := range m.Imports.AllFromFront() {
-		err = i.generate(dir, name, middlewares, generated)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *Module) GenerateToMap(middlewares ...Middleware) (map[string][]byte, error) {
-	fs := make(map[string][]byte)
-	if err := m.generateToMap(fs, "index", middlewares...); err != nil {
-		return nil, err
-	}
-	return fs, nil
-}
-
-func (m *Module) generateToMap(fs map[string][]byte, name string, middlewares ...Middleware) error {
-	if _, ok := fs[name]; ok {
-		return nil
-	}
-
-	var buf bytes.Buffer
-	var err error
-	if err = tmpl.Execute(&buf, m); err != nil {
-		return err
+		state.err = err
+		return
 	}
 
 	data := buf.Bytes()
-	for _, m := range middlewares {
-		data, err = m(data)
+	for _, middleware := range state.middlewares {
+		data, err = middleware(data)
 		if err != nil {
-			return err
-		}
-	}
-	fs[name] = data
-
-	for name, i := range m.Imports.AllFromFront() {
-		err := i.generateToMap(fs, name)
-		if err != nil {
-			return err
+			state.err = err
+			return
 		}
 	}
 
-	return nil
+	state.err = state.write(key, data)
+	return
 }
