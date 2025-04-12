@@ -52,10 +52,6 @@ func (t *transpiler) Transpile(names *set.Set[string]) {
 	}
 }
 
-func comment(s string) string {
-	return fmt.Sprintf(` /* %s */`, s)
-}
-
 func sortedDefs(pkg *packages.Package) []types.Object {
 	var defs []types.Object
 	for _, obj := range pkg.TypesInfo.Defs {
@@ -214,31 +210,31 @@ func (t *transpiler) transpileBasic(typ *types.Basic, _ *Module) string {
 	case types.Bool:
 		return "boolean"
 	case types.Int:
-		return "number" + comment("int")
+		return "number /* int */"
 	case types.Int8:
-		return "number" + comment("int8")
+		return "number /* int8 */"
 	case types.Int16:
-		return "number" + comment("int16")
+		return "number /* int16 */"
 	case types.Int32:
-		return "number" + comment("int32")
+		return "number /* int32 */"
 	case types.Int64:
-		return "number" + comment("int64")
+		return "number /* int64 */"
 	case types.Uint:
-		return "number" + comment("uint")
+		return "number /* uint */"
 	case types.Uint8:
-		return "number" + comment("uint8")
+		return "number /* uint8 */"
 	case types.Uint16:
-		return "number" + comment("uint16")
+		return "number /* uint16 */"
 	case types.Uint32:
-		return "number" + comment("uint32")
+		return "number /* uint32 */"
 	case types.Uint64:
-		return "number" + comment("uint64")
+		return "number /* uint64 */"
 	case types.Uintptr:
-		return "number" + comment("uintptr")
+		return "number /* uintptr */"
 	case types.Float32:
-		return "number" + comment("float32")
+		return "number /* float32 */"
 	case types.Float64:
-		return "number" + comment("float64")
+		return "number /* float64 */"
 	case types.String:
 		return "string"
 	default:
@@ -274,7 +270,7 @@ func (t *transpiler) transpileAlias(typ *types.Alias, mod *Module) string {
 
 func (t *transpiler) transpileNamed(typ *types.Named, mod *Module) string {
 	if typ.Obj().Pkg() == nil && typ.Obj().Name() == "comparable" {
-		return "string | number" + comment("comparable")
+		return "string | number /* comparable */"
 	}
 	return t.transpileTypeArgs(typ, mod)
 }
