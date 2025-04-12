@@ -46,14 +46,10 @@ type typeArgs interface {
 // TODO: name
 func (t *transpiler) transpileTypeArgs(typ typeArgs, mod *Module) string {
 	var sb strings.Builder
+
 	obj := typ.Obj()
 	pkg := obj.Pkg()
-
-	if pkg != nil && pkg.Path() != t.pkg.PkgPath {
-		sb.WriteString(t.include(mod, pkg, obj.Name()))
-	} else {
-		sb.WriteString(obj.Name())
-	}
+	sb.WriteString(t.include(mod, pkg, obj.Name()))
 
 	if typ.TypeArgs().Len() > 0 {
 		sb.WriteString("<")

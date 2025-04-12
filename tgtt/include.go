@@ -13,6 +13,10 @@ import (
 )
 
 func (t *transpiler) include(root *Module, tpkg *types.Package, objName string) string {
+	if tpkg == nil {
+		return objName
+	}
+
 	pkgName := t.getPkgName(tpkg)
 	var mod *Module
 	var ok bool

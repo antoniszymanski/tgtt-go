@@ -102,14 +102,9 @@ func (t *transpiler) transpileConst(obj *types.Const, mod *Module) {
 	var def string
 	switch typ := obj.Type().(type) {
 	case *types.Named:
-		var typStr string
 		tobj := typ.Obj()
 		pkg := tobj.Pkg()
-		if pkg != nil && pkg.Path() != t.pkg.PkgPath {
-			typStr = t.include(mod, pkg, tobj.Name())
-		} else {
-			typStr = obj.Name()
-		}
+		typStr := t.include(mod, pkg, tobj.Name())
 
 		val, ok := transpileConstVal(obj.Val())
 		if !ok {
