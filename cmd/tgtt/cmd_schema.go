@@ -45,6 +45,7 @@ func (c *cmdSchema) Run() error {
 	schema := r.ReflectFromType(reflect.TypeFor[internal.Config]())
 
 	enc := json.NewEncoder(f)
+	enc.SetEscapeHTML(false)
 	enc.SetIndent("", "\t")
 	return enc.Encode(schema)
 }
