@@ -14,6 +14,7 @@ type cli struct {
 	Init     cmdInit     `cmd:""`
 	Schema   cmdSchema   `cmd:""`
 	Generate cmdGenerate `cmd:""`
+	Version  cmdVersion  `cmd:""`
 }
 
 func main() {
