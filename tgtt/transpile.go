@@ -266,8 +266,14 @@ func (t *transpiler) transpileAlias(typ *types.Alias, mod *Module) string {
 }
 
 func (t *transpiler) transpileNamed(typ *types.Named, mod *Module) string {
-	if typ.Obj().Pkg() == nil && typ.Obj().Name() == "comparable" {
-		return "string | number /* comparable */"
+	obj := typ.Obj()
+	if obj.Pkg() == nil {
+		switch obj.Name() {
+		case "comparable":
+			return "string | number /* comparable */"
+		case "error":
+			return "any /* error */"
+		}
 	}
 	return t.transpileTypeArgs(typ, mod)
 }
