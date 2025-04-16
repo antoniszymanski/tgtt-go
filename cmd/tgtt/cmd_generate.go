@@ -46,11 +46,11 @@ func (c *cmdGenerate) Run() error {
 		middlewares = append(
 			middlewares,
 			func(b []byte) ([]byte, error) {
-				buf, err := sanefmt.Format(bytes.NewReader(b))
+				b, err := sanefmt.Format(bytes.NewReader(b))
 				if err != nil {
 					return nil, err
 				}
-				return buf.Bytes(), nil
+				return b, nil
 			},
 		)
 	}
