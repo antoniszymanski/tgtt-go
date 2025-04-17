@@ -318,6 +318,9 @@ func (t *transpiler) transpileInterface(typ *types.Interface, mod *Module) strin
 	for _, y := range unions[1:] {
 		unions[0] = intersect(unions[0], y)
 	}
+	if len(unions[0]) == 0 {
+		return "any"
+	}
 
 	terms := orderedset.New[string]()
 	for _, termTyp := range unions[0] {
