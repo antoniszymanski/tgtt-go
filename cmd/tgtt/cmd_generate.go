@@ -64,6 +64,7 @@ func (c *cmdGenerate) Run() error {
 		t := tgtt.NewTranspiler(pkg)
 		maps.Copy(t.TypeMappings, cfg.TypeMappings)
 		maps.Copy(t.TypeMappings, pkgCfg.TypeMappings)
+		t.IncludeUnexported = pkgCfg.IncludeUnexported
 		t.Transpile(pkgCfg.Names)
 
 		err = t.Index().WriteTS(pkgCfg.OutputPath, middlewares...)

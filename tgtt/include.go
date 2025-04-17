@@ -67,7 +67,9 @@ func (t *transpiler) include(root *Module, tpkg *types.Package, objName string) 
 			return tpkg.Path()+"."+objName == t.getPkgPath(typ.Obj())
 		}()
 
-		if obj.Name() == objName || isMatchingConstType {
+		if obj.Name() == objName {
+			t.transpileObject(obj, mod)
+		} else if isMatchingConstType && (obj.Exported() || t.IncludeUnexported) {
 			t.transpileObject(obj, mod)
 		}
 	}

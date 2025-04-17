@@ -23,10 +23,11 @@ import (
 )
 
 type transpiler struct {
-	pkg          *packages.Package
-	pkgNames     bimap.BiMap[string, string]
-	Modules      map[string]*Module
-	TypeMappings map[string]string
+	pkg               *packages.Package
+	pkgNames          bimap.BiMap[string, string]
+	Modules           map[string]*Module
+	TypeMappings      map[string]string
+	IncludeUnexported bool
 }
 
 func NewTranspiler(pkg *packages.Package) *transpiler {
@@ -45,9 +46,12 @@ func (t *transpiler) Index() *Module {
 }
 
 func (t *transpiler) Transpile(names *set.Set[string]) {
+	isNamesEmpty := names == nil || names.Empty()
 	for _, obj := range sortedDefs(t.pkg) {
-		if names == nil || names.Size() == 0 || names.Contains(obj.Name()) {
-			t.transpileObject(obj, t.Modules["index"])
+		if !isNamesEmpty && names.Contains(obj.Name()) {
+			t.transpileObject(obj, t.Index())
+		} else if isNamesEmpty && (obj.Exported() || t.IncludeUnexported) {
+			t.transpileObject(obj, t.Index())
 		}
 	}
 }
