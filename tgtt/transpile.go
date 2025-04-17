@@ -113,14 +113,14 @@ func (t *transpiler) transpileConst(obj *types.Const, mod *Module) {
 		pkg := tobj.Pkg()
 		typStr := t.include(mod, pkg, tobj.Name())
 
-		val, ok := transpileConstVal(obj.Val())
+		val, ok := transpileConstVal(obj.Val(), false)
 		if !ok {
 			mod.Defs.Delete(obj.Name())
 			return
 		}
 		def = fmt.Sprintf(`const %s: %s = %s`, obj.Name(), typStr, val)
 	default:
-		val, ok := transpileConstVal(obj.Val())
+		val, ok := transpileConstVal(obj.Val(), true)
 		if !ok {
 			mod.Defs.Delete(obj.Name())
 			return
@@ -130,7 +130,7 @@ func (t *transpiler) transpileConst(obj *types.Const, mod *Module) {
 	mod.Defs.Set(obj.Name(), def)
 }
 
-func transpileConstVal(x constant.Value) (string, bool) {
+func transpileConstVal(x constant.Value, allowBigint bool) (string, bool) {
 	const maxSafeInt = 1<<53 - 1
 	const minSafeInt = -(1<<53 - 1)
 	switch x := constant.Val(x).(type) {
@@ -140,14 +140,13 @@ func transpileConstVal(x constant.Value) (string, bool) {
 		return strconv.Quote(x), true
 	case int64:
 		s := strconv.FormatInt(x, 10)
-		if x < minSafeInt || x > maxSafeInt {
+		if allowBigint && (x < minSafeInt || x > maxSafeInt) {
 			s += "n" // BigInt
 		}
 		return s, true
 	case *big.Int:
 		s := x.String()
-		if x.Cmp(big.NewInt(minSafeInt)) == -1 ||
-			x.Cmp(big.NewInt(maxSafeInt)) == 1 {
+		if allowBigint && (x.Cmp(big.NewInt(minSafeInt)) == -1 || x.Cmp(big.NewInt(maxSafeInt)) == 1) {
 			s += "n" // BigInt
 		}
 		return s, true
