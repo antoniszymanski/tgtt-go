@@ -13,6 +13,7 @@ import (
 	"reflect"
 
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
+	"github.com/hashicorp/go-set/v3"
 	"github.com/invopop/jsonschema"
 )
 
@@ -41,6 +42,14 @@ func (c *cmdSchema) Run() error {
 		RequiredFromJSONSchemaTags: true,
 		DoNotReference:             true,
 		CommentMap:                 internal.CommentMap(),
+	}
+	r.Mapper = func(t reflect.Type) *jsonschema.Schema {
+		if t == reflect.TypeFor[set.Set[string]]() {
+			schema := r.ReflectFromType(reflect.TypeFor[[]string]())
+			schema.Version = ""
+			return schema
+		}
+		return nil
 	}
 	schema := r.ReflectFromType(reflect.TypeFor[internal.Config]())
 
