@@ -118,14 +118,14 @@ func (t *transpiler) transpileConst(obj *types.Const, mod *Module) {
 			mod.Defs.Delete(obj.Name())
 			return
 		}
-		def = fmt.Sprintf(`const %s: %s = %s`, obj.Name(), typStr, val)
+		def = fmt.Sprintf(`export const %s: %s = %s`, obj.Name(), typStr, val)
 	default:
 		val, ok := transpileConstVal(obj.Val(), true)
 		if !ok {
 			mod.Defs.Delete(obj.Name())
 			return
 		}
-		def = fmt.Sprintf(`const %s = %s`, obj.Name(), val)
+		def = fmt.Sprintf(`export const %s = %s`, obj.Name(), val)
 	}
 	mod.Defs.Set(obj.Name(), def)
 }
