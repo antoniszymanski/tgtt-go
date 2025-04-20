@@ -21,8 +21,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - run: go generate ./...
-        shell: bash
       - run: go install golang.org/x/vuln/cmd/govulncheck@latest
         shell: bash
       - run: govulncheck ./...
