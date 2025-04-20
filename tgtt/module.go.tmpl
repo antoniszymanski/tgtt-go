@@ -5,7 +5,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */ -}}
 
 /* {{$.GoPath}} */
-{{range $path, $m := $.Imports.AllFromFront -}}
+{{range $path := $.Imports.Keys -}}
 import * as {{$path}} from "./{{$path}}";
 {{end}}
 
