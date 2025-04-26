@@ -16,7 +16,7 @@ func (t *transpiler) transpileTypeParams(tparams *types.TypeParamList, mod *Modu
 	var sb strings.Builder
 
 	if tparams.Len() > 0 {
-		sb.WriteString("<")
+		sb.WriteByte('<')
 	}
 	for i := range tparams.Len() {
 		tparam := tparams.At(i)
@@ -31,7 +31,7 @@ func (t *transpiler) transpileTypeParams(tparams *types.TypeParamList, mod *Modu
 		}
 	}
 	if tparams.Len() > 0 {
-		sb.WriteString(">")
+		sb.WriteByte('>')
 	}
 
 	return sb.String()
@@ -52,7 +52,7 @@ func (t *transpiler) transpileTypeArgs(typ typeArgs, mod *Module) string {
 	sb.WriteString(t.include(mod, pkg, obj.Name()))
 
 	if typ.TypeArgs().Len() > 0 {
-		sb.WriteString("<")
+		sb.WriteByte('<')
 	}
 	for i := range typ.TypeArgs().Len() {
 		targ := typ.TypeArgs().At(i)
@@ -62,7 +62,7 @@ func (t *transpiler) transpileTypeArgs(typ typeArgs, mod *Module) string {
 		}
 	}
 	if typ.TypeArgs().Len() > 0 {
-		sb.WriteString(">")
+		sb.WriteByte('>')
 	}
 
 	return sb.String()

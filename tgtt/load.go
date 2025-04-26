@@ -57,11 +57,11 @@ func (err PackageError) Error() string {
 
 	for _, pkgErr := range err.Errors {
 		sb.WriteString(pkgErr.Error())
-		sb.WriteString("\n")
+		sb.WriteByte('\n')
 	}
 	if err.ModuleError != nil {
 		sb.WriteString(err.ModuleError.Err)
-		sb.WriteString("\n")
+		sb.WriteByte('\n')
 	}
 
 	return strings.TrimSuffix(sb.String(), "\n")

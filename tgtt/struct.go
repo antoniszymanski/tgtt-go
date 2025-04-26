@@ -75,9 +75,9 @@ func (t *transpiler) transpileStructBody(s structData, mod *Module) string {
 	}
 
 	if len(s.Fields) == 0 {
-		sb.WriteString(" ")
+		sb.WriteByte(' ')
 	}
-	sb.WriteString("}")
+	sb.WriteByte('}')
 
 	return sb.String()
 }
