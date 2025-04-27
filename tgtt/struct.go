@@ -59,8 +59,11 @@ func (t *transpiler) transpileExtends(s structData, mod *Module) string {
 
 func (t *transpiler) transpileStructBody(s structData, mod *Module) string {
 	var sb strings.Builder
-	sb.WriteString("{ ")
 
+	sb.WriteByte('{')
+	if len(s.Fields) > 0 {
+		sb.WriteByte(' ')
+	}
 	for _, field := range s.Fields {
 		format := `%s: %s; `
 		if field.Optional {
@@ -72,10 +75,6 @@ func (t *transpiler) transpileStructBody(s structData, mod *Module) string {
 			strconv.Quote(field.Name),
 			t.transpileType(field.Type, mod),
 		)
-	}
-
-	if len(s.Fields) == 0 {
-		sb.WriteByte(' ')
 	}
 	sb.WriteByte('}')
 
