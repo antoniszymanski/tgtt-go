@@ -12,7 +12,7 @@ require (
 	github.com/hashicorp/go-set/v3 v3.0.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/lindell/go-ordered-set v1.0.2
-	golang.org/x/tools v0.32.0
+	golang.org/x/tools v0.33.0
 )
 
 tool github.com/antoniszymanski/mapcomments-go
@@ -27,7 +27,7 @@ require (
 	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	golang.org/x/mod v0.24.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/sync v0.14.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
