@@ -5,7 +5,7 @@ go 1.24.2
 require (
 	github.com/alecthomas/kong v1.11.0
 	github.com/antoniszymanski/bimap-go v0.1.1
-	github.com/antoniszymanski/sanefmt-go v0.2.0
+	github.com/antoniszymanski/sanefmt-go v0.2.1
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/fatih/structtag v1.2.0
 	github.com/goccy/go-yaml v1.17.1
@@ -18,7 +18,7 @@ require (
 tool github.com/antoniszymanski/mapcomments-go
 
 require (
-	codeberg.org/msantos/embedexe v0.0.0-20240114132617-3fba3b125f68 // indirect
+	codeberg.org/msantos/embedexe v0.0.0-20250421111610-c1538c66a2a1 // indirect
 	codeberg.org/msantos/execve v0.0.0-20230206112018-e5c3a7f4d436 // indirect
 	github.com/antoniszymanski/mapcomments-go v0.1.2 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
