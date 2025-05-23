@@ -1,5 +1,5 @@
-codeberg.org/msantos/embedexe v0.0.0-20240114132617-3fba3b125f68 h1:MoP+gXpdeLA7Ft3PGH8Zv6hC46Q9vlFUYMhVCUcUeEk=
-codeberg.org/msantos/embedexe v0.0.0-20240114132617-3fba3b125f68/go.mod h1:ipqSRAomnausawEF799WqXRHS6GzorCo7MN//9DC9+0=
+codeberg.org/msantos/embedexe v0.0.0-20250421111610-c1538c66a2a1 h1:kNgh5czOvrBtHD81ir3HrleBumsuCdjTU6LOeZNBpG4=
+codeberg.org/msantos/embedexe v0.0.0-20250421111610-c1538c66a2a1/go.mod h1:ipqSRAomnausawEF799WqXRHS6GzorCo7MN//9DC9+0=
 codeberg.org/msantos/execve v0.0.0-20230206112018-e5c3a7f4d436 h1:JfctQYg/vUC3LpnjGeNTDI/JSenwfeshld2kUjjR2+0=
 codeberg.org/msantos/execve v0.0.0-20230206112018-e5c3a7f4d436/go.mod h1:mvAmIdjLHiBlHQXtcPhQycOi0QuCAbw8dxOXxk0gYaE=
 github.com/alecthomas/assert/v2 v2.11.0 h1:2Q9r3ki8+JYXvGsDyBXwH3LcJ+WK5D0gc5E8vS6K3D0=
@@ -12,8 +12,8 @@ github.com/antoniszymanski/bimap-go v0.1.1 h1:UBgHoyYPRj6iqiNEVPfs47Y7RHr5wuHb9a
 github.com/antoniszymanski/bimap-go v0.1.1/go.mod h1:WlLryEgFvO1VUWhd5WJ60uk+gw+cHE7Gnu0bsGY7vgs=
 github.com/antoniszymanski/mapcomments-go v0.1.2 h1:9bxv24utqDUOcKarszqcQYMI0/idb5ergQurKReBqsM=
 github.com/antoniszymanski/mapcomments-go v0.1.2/go.mod h1:uF15GFjW032rcklJxIW1ITx4j9hiFLOa5uSWoNn89Jo=
-github.com/antoniszymanski/sanefmt-go v0.2.0 h1:evLOQWB7mYwtNzMWTaZAYNXUUAB1dMz1LlrwKU/PW+E=
-github.com/antoniszymanski/sanefmt-go v0.2.0/go.mod h1:3HVmC6iWsZZB/c/TCI1zJNqYfdx9rlGjnTTw9+MJW/M=
+github.com/antoniszymanski/sanefmt-go v0.2.1 h1:pjZlgyu4vefeKx0FWRS6dneOZgZ4g2CNw+uAVCPQ4dQ=
+github.com/antoniszymanski/sanefmt-go v0.2.1/go.mod h1:NX+4/pTXqADu+MDkqjW3LFSbQjFy0EjnU47dMLuNOzE=
 github.com/bahlo/generic-list-go v0.2.0 h1:5sz/EEAK+ls5wF+NeqDpk5+iNdMDXrh3z3nPnH1Wvgk=
 github.com/bahlo/generic-list-go v0.2.0/go.mod h1:2KvAjgMlE5NNynlg/5iLrrCCZ2+5xWbdbCW3pNTGyYg=
 github.com/buger/jsonparser v1.1.1 h1:2PnMjfWD7wBILjqQbt530v576A/cAbQvEW9gGIpYMUs=
