@@ -51,5 +51,5 @@ func (c *cmdInit) Run() error {
 			return err
 		}
 	}
-	return yaml.NewEncoder(f).Encode(internal.Config{})
+	return yaml.NewEncoder(f, yaml.UseJSONMarshaler()).Encode(internal.Config{})
 }

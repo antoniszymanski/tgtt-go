@@ -4,7 +4,6 @@ go 1.24.2
 
 require (
 	github.com/alecthomas/kong v1.11.0
-	github.com/antoniszymanski/bimap-go v0.1.1
 	github.com/antoniszymanski/sanefmt-go v0.2.1
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/fatih/structtag v1.2.0

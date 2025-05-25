@@ -7,7 +7,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 package tgtt
 
 import (
-	"cmp"
 	"fmt"
 	"go/constant"
 	"go/types"
@@ -16,44 +15,25 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/antoniszymanski/bimap-go"
+	"github.com/fatih/structtag"
 	"github.com/hashicorp/go-set/v3"
 	"github.com/lindell/go-ordered-set/orderedset"
 	"golang.org/x/tools/go/packages"
 )
 
-type transpiler struct {
-	pkg               *packages.Package
-	pkgNames          bimap.BiMap[string, string]
-	Modules           map[string]*Module
-	TypeMappings      map[string]string
-	IncludeUnexported bool
-}
-
-func NewTranspiler(pkg *packages.Package) *transpiler {
-	return &transpiler{
-		pkg:      pkg,
-		pkgNames: bimap.New[string, string](0),
-		Modules: map[string]*Module{
-			"index": NewModule(pkg.PkgPath),
-		},
-		TypeMappings: make(map[string]string),
-	}
-}
-
-func (t *transpiler) Index() *Module {
-	return t.Modules["index"]
-}
-
-func (t *transpiler) Transpile(names *set.Set[string]) {
+func (t *Transpiler) Transpile(names *set.Set[string]) {
 	isNamesEmpty := names == nil || names.Empty()
 	for _, obj := range sortedDefs(t.pkg) {
 		if !isNamesEmpty && names.Contains(obj.Name()) {
 			t.transpileObject(obj, t.Index())
-		} else if isNamesEmpty && (obj.Exported() || t.IncludeUnexported) {
+		} else if isNamesEmpty && (obj.Exported() || t.includeUnexported) {
 			t.transpileObject(obj, t.Index())
 		}
 	}
+}
+
+func (t *Transpiler) Index() *Module {
+	return t.Modules["index"]
 }
 
 func sortedDefs(pkg *packages.Package) []types.Object {
@@ -68,11 +48,10 @@ func sortedDefs(pkg *packages.Package) []types.Object {
 		func(a, b types.Object) int {
 			aPos := pkg.Fset.Position(a.Pos())
 			bPos := pkg.Fset.Position(b.Pos())
-			c := strings.Compare(aPos.Filename, bPos.Filename)
-			if c != 0 {
+			if c := strings.Compare(aPos.Filename, bPos.Filename); c != 0 {
 				return c
 			}
-			return cmp.Compare(aPos.Line, bPos.Line)
+			return aPos.Line - bPos.Line
 		},
 	)
 	return defs
@@ -87,14 +66,20 @@ func isTranspilable(obj types.Object) bool {
 	case *types.Const:
 		return constant.Val(obj.Val()) != nil
 	case *types.TypeName:
-		_, ok := obj.Type().(topLevel)
+		_, ok := obj.Type().(transpilableType)
 		return ok
 	default:
 		return false
 	}
 }
 
-func (t *transpiler) transpileObject(obj types.Object, mod *Module) {
+type transpilableType interface {
+	Obj() *types.TypeName
+	Underlying() types.Type
+	TypeParams() *types.TypeParamList
+}
+
+func (t *Transpiler) transpileObject(obj types.Object, mod *Module) {
 	if mod.Defs.Has(obj.Name()) {
 		return
 	}
@@ -104,19 +89,16 @@ func (t *transpiler) transpileObject(obj types.Object, mod *Module) {
 	case *types.Const:
 		t.transpileConst(obj, mod)
 	case *types.TypeName:
-		t.transpileTypeName(obj, mod)
+		t.transpileTypeDef(obj, mod)
 	}
 }
 
-func (t *transpiler) transpileConst(obj *types.Const, mod *Module) {
+func (t *Transpiler) transpileConst(obj *types.Const, mod *Module) {
 	mod.Defs.Set(obj.Name(), "") // prevent infinite recursion
 	var def string
 	switch typ := obj.Type().(type) {
 	case *types.Named:
-		tobj := typ.Obj()
-		pkg := tobj.Pkg()
-		typStr := t.include(mod, pkg, tobj.Name())
-
+		typStr := t.transpileTypeRef(typ.Obj(), mod)
 		val, ok := transpileConstVal(obj.Val(), false)
 		if !ok {
 			mod.Defs.Delete(obj.Name())
@@ -165,24 +147,31 @@ func transpileConstVal(x constant.Value, allowBigint bool) (string, bool) {
 	}
 }
 
-func (t *transpiler) transpileTypeName(obj *types.TypeName, mod *Module) {
-	typ, ok := obj.Type().(topLevel)
+func (t *Transpiler) transpileTypeDef(obj *types.TypeName, mod *Module) {
+	typ, ok := obj.Type().(transpilableType)
 	if !ok {
 		return
 	}
 
 	mod.Defs.Set(obj.Name(), "") // prevent infinite recursion
 	var def string
-	switch typ.Underlying().(type) {
-	case *types.Struct:
-		def = t.transpileStruct(typ, mod)
-	default:
-		def = t.transpileToplevel(typ, mod)
+	{
+		path := t.getPkgPath(typ.Obj())
+		typStr, ok := t.typeMappings[path]
+		if !ok {
+			typStr = t.transpileType(typ.Underlying(), mod)
+		}
+		def = fmt.Sprintf(
+			`export type %s%s = %s`,
+			typ.Obj().Name(),
+			t.transpileTypeParams(typ.TypeParams(), mod),
+			typStr,
+		)
 	}
 	mod.Defs.Set(obj.Name(), def)
 }
 
-func (t *transpiler) transpileType(typ types.Type, mod *Module) string {
+func (t *Transpiler) transpileType(typ types.Type, mod *Module) string {
 	// https://github.com/golang/example/tree/master/gotypes#types
 	switch typ := typ.(type) {
 	case *types.Basic:
@@ -196,7 +185,7 @@ func (t *transpiler) transpileType(typ types.Type, mod *Module) string {
 	case *types.Map:
 		return t.transpileMap(typ, mod)
 	case *types.Struct:
-		return t.transpileStructBody(parseStruct(typ), mod)
+		return t.transpileStruct(typ, mod)
 	case *types.Alias:
 		return t.transpileAlias(typ, mod)
 	case *types.Named:
@@ -212,7 +201,7 @@ func (t *transpiler) transpileType(typ types.Type, mod *Module) string {
 	}
 }
 
-func (t *transpiler) transpileBasic(typ *types.Basic, _ *Module) string {
+func (t *Transpiler) transpileBasic(typ *types.Basic, _ *Module) string {
 	switch typ.Kind() {
 	case types.Bool:
 		return "boolean"
@@ -249,7 +238,7 @@ func (t *transpiler) transpileBasic(typ *types.Basic, _ *Module) string {
 	}
 }
 
-func (t *transpiler) transpilePointer(typ *types.Pointer, mod *Module) string {
+func (t *Transpiler) transpilePointer(typ *types.Pointer, mod *Module) string {
 	typStr := t.transpileType(typ.Elem(), mod)
 	if !strings.HasSuffix(typStr, " | null") {
 		typStr += " | null"
@@ -257,38 +246,120 @@ func (t *transpiler) transpilePointer(typ *types.Pointer, mod *Module) string {
 	return typStr
 }
 
-func (t *transpiler) transpileArray(typ *types.Array, mod *Module) string {
+func (t *Transpiler) transpileArray(typ *types.Array, mod *Module) string {
 	return fmt.Sprintf(`%s[]`, t.transpileType(typ.Elem(), mod))
 }
 
-func (t *transpiler) transpileSlice(typ *types.Slice, mod *Module) string {
+func (t *Transpiler) transpileSlice(typ *types.Slice, mod *Module) string {
 	return fmt.Sprintf(`%s[]`, t.transpileType(typ.Elem(), mod))
 }
 
-func (t *transpiler) transpileMap(typ *types.Map, mod *Module) string {
+func (t *Transpiler) transpileMap(typ *types.Map, mod *Module) string {
 	return fmt.Sprintf(
 		`{ [key in string]: %s }`, t.transpileType(typ.Elem(), mod),
 	)
 }
 
-func (t *transpiler) transpileAlias(typ *types.Alias, mod *Module) string {
-	return t.transpileTypeArgs(typ, mod)
-}
+func (t *Transpiler) transpileStruct(typ *types.Struct, mod *Module) string {
+	var sb strings.Builder
+	s := parseStruct(typ)
 
-func (t *transpiler) transpileNamed(typ *types.Named, mod *Module) string {
-	obj := typ.Obj()
-	if obj.Pkg() == nil {
-		switch obj.Name() {
-		case "comparable":
-			return "string | number /* comparable */"
-		case "error":
-			return "any /* error */"
+	sb.WriteByte('{')
+	if len(s.Fields) > 0 {
+		sb.WriteByte(' ')
+	}
+	for _, field := range s.Fields {
+		format := `%s: %s; `
+		if field.Optional {
+			format = `%s?: %s; `
+		}
+		fmt.Fprintf(
+			&sb,
+			format,
+			strconv.Quote(field.Name),
+			t.transpileType(field.Type, mod),
+		)
+	}
+	sb.WriteByte('}')
+
+	for _, embed := range s.Embeds {
+		sb.WriteString(" & ")
+
+		typStr := t.transpileType(embed.Type, mod)
+		typStr, found := strings.CutSuffix(typStr, " | null")
+		if !embed.Optional && !found {
+			sb.WriteString(typStr)
+		} else {
+			sb.WriteString("Partial<" + typStr + ">")
 		}
 	}
-	return t.transpileTypeArgs(typ, mod)
+
+	return sb.String()
 }
 
-func (t *transpiler) transpileInterface(typ *types.Interface, mod *Module) string {
+type structData struct {
+	Embeds, Fields []fieldData
+}
+
+type fieldData struct {
+	Name     string
+	Optional bool
+	Type     types.Type
+}
+
+func parseStruct(typ *types.Struct) structData {
+	var s structData
+	for i := range typ.NumFields() {
+		field := typ.Field(i)
+		if !field.Exported() {
+			continue
+		}
+
+		var f fieldData
+		embedded := field.Embedded()
+		func() {
+			tags, err := structtag.Parse(typ.Tag(i))
+			if tags == nil || err != nil {
+				f.Name = field.Name()
+				return
+			}
+
+			tag, err := tags.Get("json")
+			if err != nil {
+				f.Name = field.Name()
+				return
+			}
+
+			f.Name = tag.Name
+			f.Optional = tag.HasOption("omitempty")
+			if !embedded {
+				embedded = tag.HasOption("inline")
+			}
+		}()
+		if f.Name == "-" {
+			continue
+		}
+
+		f.Type = field.Type()
+		if !embedded {
+			s.Fields = append(s.Fields, f)
+		} else {
+			s.Embeds = append(s.Embeds, f)
+		}
+	}
+
+	return s
+}
+
+func (t *Transpiler) transpileAlias(typ *types.Alias, mod *Module) string {
+	return t.transpileTypeRef(typ.Obj(), mod) + t.transpileTypeArgs(typ.TypeArgs(), mod)
+}
+
+func (t *Transpiler) transpileNamed(typ *types.Named, mod *Module) string {
+	return t.transpileTypeRef(typ.Obj(), mod) + t.transpileTypeArgs(typ.TypeArgs(), mod)
+}
+
+func (t *Transpiler) transpileInterface(typ *types.Interface, mod *Module) string {
 	intersect := func(a, b []types.Type) []types.Type {
 		var dest []types.Type
 		for _, x := range a {
@@ -332,7 +403,7 @@ func (t *transpiler) transpileInterface(typ *types.Interface, mod *Module) strin
 	return strings.Join(terms.Values(), " | ")
 }
 
-func (t *transpiler) transpileUnion(typ *types.Union, mod *Module) string {
+func (t *Transpiler) transpileUnion(typ *types.Union, mod *Module) string {
 	terms := orderedset.New[string]()
 	for term := range typ.Terms() {
 		terms.Add(t.transpileType(term.Type(), mod))
@@ -344,6 +415,6 @@ func (t *transpiler) transpileUnion(typ *types.Union, mod *Module) string {
 	return strings.Join(terms.Values(), " | ")
 }
 
-func (t *transpiler) transpileTypeParam(typ *types.TypeParam, _ *Module) string {
+func (t *Transpiler) transpileTypeParam(typ *types.TypeParam, _ *Module) string {
 	return typ.Obj().Name()
 }

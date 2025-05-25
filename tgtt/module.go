@@ -24,9 +24,7 @@ type Module struct {
 	Defs    *orderedmap.OrderedMap[string, string]
 }
 
-type MiddlewareFunc func([]byte) ([]byte, error)
-
-func NewModule(goPath string) *Module {
+func newModule(goPath string) *Module {
 	return &Module{
 		GoPath:  goPath,
 		Imports: orderedmap.NewOrderedMap[string, *Module](),
@@ -40,19 +38,21 @@ var tmplSource string
 var tmpl = template.Must(template.New("module").Parse(tmplSource))
 
 type state struct {
-	wg          sync.WaitGroup
-	err         error
-	middlewares []MiddlewareFunc
-	mustSkip    func(key string) bool
-	write       func(key string, data []byte) error
+	wg             sync.WaitGroup
+	err            error
+	postprocessors []PostProcessor
+	mustSkip       func(key string) bool
+	write          func(key string, data []byte) error
 }
 
-func (m *Module) WriteTS(outputDir string, middlewares ...MiddlewareFunc) error {
+type PostProcessor func([]byte) ([]byte, error)
+
+func (m *Module) WriteTS(outputDir string, postprocessors ...PostProcessor) error {
 	if err := os.MkdirAll(outputDir, 0750); err != nil {
 		return err
 	}
 
-	s := state{middlewares: middlewares}
+	s := state{postprocessors: postprocessors}
 	//
 	writtenFiles := set.New[string](0)
 	var mu sync.Mutex
@@ -77,8 +77,8 @@ func (m *Module) WriteTS(outputDir string, middlewares ...MiddlewareFunc) error 
 	return s.err
 }
 
-func (m *Module) GenerateTS(middlewares ...MiddlewareFunc) (map[string][]byte, error) {
-	s := state{middlewares: middlewares}
+func (m *Module) GenerateTS(middlewares ...PostProcessor) (map[string][]byte, error) {
+	s := state{postprocessors: middlewares}
 	tsFiles := make(map[string][]byte)
 	var mu sync.Mutex
 	//
@@ -128,8 +128,8 @@ func (m *Module) emitTS(state *state, key string) {
 	}
 
 	data := buf.Bytes()
-	for _, middleware := range state.middlewares {
-		data, err = middleware(data)
+	for _, postprocessor := range state.postprocessors {
+		data, err = postprocessor(data)
 		if err != nil {
 			state.err = err
 			return

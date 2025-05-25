@@ -9,6 +9,7 @@ package internal
 import "github.com/hashicorp/go-set/v3"
 
 //go:generate go tool mapcomments-go . . -P internal --mpl2
+
 type Config struct {
 	Format       bool              `yaml:"format"`
 	TypeMappings map[string]string `yaml:"type_mappings"`

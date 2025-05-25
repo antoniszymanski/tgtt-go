@@ -12,15 +12,15 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-var cache = make(map[string]*packages.Package)
-
-func LoadPackage(pattern string) (*packages.Package, error) {
-	if pkg, ok := cache[pattern]; ok {
-		return pkg, nil
+func loadPackage(pattern string) (*packages.Package, error) {
+	cfg := &packages.Config{
+		Mode: packages.NeedName |
+			packages.NeedImports |
+			packages.NeedDeps |
+			packages.NeedTypes |
+			packages.NeedTypesInfo,
 	}
-
-	cfg := packages.Config{Mode: packages.LoadAllSyntax}
-	pkgs, err := packages.Load(&cfg, pattern)
+	pkgs, err := packages.Load(cfg, pattern)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,6 @@ func LoadPackage(pattern string) (*packages.Package, error) {
 		return nil, err
 	}
 
-	cache[pattern] = pkgs[0]
 	return pkgs[0], nil
 }
 

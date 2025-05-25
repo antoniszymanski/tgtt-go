@@ -8,8 +8,6 @@ github.com/alecthomas/kong v1.11.0 h1:y++1gI7jf8O7G7l4LZo5ASFhrhJvzc+WgF/arranEm
 github.com/alecthomas/kong v1.11.0/go.mod h1:p2vqieVMeTAnaC83txKtXe8FLke2X07aruPWXyMPQrU=
 github.com/alecthomas/repr v0.4.0 h1:GhI2A8MACjfegCPVq9f1FLvIBS+DrQ2KQBFZP1iFzXc=
 github.com/alecthomas/repr v0.4.0/go.mod h1:Fr0507jx4eOXV7AlPV6AVZLYrLIuIeSOWtW57eE/O/4=
-github.com/antoniszymanski/bimap-go v0.1.1 h1:UBgHoyYPRj6iqiNEVPfs47Y7RHr5wuHb9awJ35dVnfQ=
-github.com/antoniszymanski/bimap-go v0.1.1/go.mod h1:WlLryEgFvO1VUWhd5WJ60uk+gw+cHE7Gnu0bsGY7vgs=
 github.com/antoniszymanski/mapcomments-go v0.1.2 h1:9bxv24utqDUOcKarszqcQYMI0/idb5ergQurKReBqsM=
 github.com/antoniszymanski/mapcomments-go v0.1.2/go.mod h1:uF15GFjW032rcklJxIW1ITx4j9hiFLOa5uSWoNn89Jo=
 github.com/antoniszymanski/sanefmt-go v0.2.1 h1:pjZlgyu4vefeKx0FWRS6dneOZgZ4g2CNw+uAVCPQ4dQ=

@@ -41,10 +41,10 @@ func (c *cmdGenerate) Run() error {
 		return err
 	}
 
-	var middlewares []tgtt.MiddlewareFunc
+	var postprocessors []tgtt.PostProcessor
 	if cfg.Format {
-		middlewares = append(
-			middlewares,
+		postprocessors = append(
+			postprocessors,
 			func(b []byte) ([]byte, error) {
 				b, err := sanefmt.Format(bytes.NewReader(b))
 				if err != nil {
@@ -56,18 +56,24 @@ func (c *cmdGenerate) Run() error {
 	}
 
 	for _, pkgCfg := range cfg.Packages {
-		pkg, err := tgtt.LoadPackage(pkgCfg.Path)
+		var opts []tgtt.TranspilerOption
+		{
+			typeMappings := make(map[string]string)
+			maps.Copy(typeMappings, cfg.TypeMappings)
+			maps.Copy(typeMappings, pkgCfg.TypeMappings)
+			opts = append(opts, tgtt.TypeMappings(typeMappings))
+		}
+		if pkgCfg.IncludeUnexported {
+			opts = append(opts, tgtt.IncludeUnexported())
+		}
+
+		t, err := tgtt.NewTranspiler(pkgCfg.Path, opts...)
 		if err != nil {
 			return err
 		}
-
-		t := tgtt.NewTranspiler(pkg)
-		maps.Copy(t.TypeMappings, cfg.TypeMappings)
-		maps.Copy(t.TypeMappings, pkgCfg.TypeMappings)
-		t.IncludeUnexported = pkgCfg.IncludeUnexported
 		t.Transpile(pkgCfg.Names)
 
-		err = t.Index().WriteTS(pkgCfg.OutputPath, middlewares...)
+		err = t.Index().WriteTS(pkgCfg.OutputPath, postprocessors...)
 		if err != nil {
 			return err
 		}
