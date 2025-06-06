@@ -2,6 +2,8 @@ module github.com/antoniszymanski/tgtt-go
 
 go 1.24.2
 
+tool github.com/antoniszymanski/mapcomments-go
+
 require (
 	github.com/alecthomas/kong v1.11.0
 	github.com/antoniszymanski/sanefmt-go v0.2.1
@@ -13,8 +15,6 @@ require (
 	github.com/lindell/go-ordered-set v1.0.2
 	golang.org/x/tools v0.34.0
 )
-
-tool github.com/antoniszymanski/mapcomments-go
 
 require (
 	codeberg.org/msantos/embedexe v0.0.0-20250421111610-c1538c66a2a1 // indirect
