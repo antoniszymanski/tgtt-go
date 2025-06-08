@@ -7,6 +7,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 package tgtt
 
 import (
+	"cmp"
 	"fmt"
 	"go/constant"
 	"go/types"
@@ -51,7 +52,7 @@ func sortedDefs(pkg *packages.Package) []types.Object {
 			if c := strings.Compare(aPos.Filename, bPos.Filename); c != 0 {
 				return c
 			}
-			return aPos.Line - bPos.Line
+			return cmp.Compare(aPos.Line, bPos.Line)
 		},
 	)
 	return defs

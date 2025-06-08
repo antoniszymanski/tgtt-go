@@ -7,6 +7,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 package tgtt
 
 import (
+	"cmp"
 	"slices"
 	"strconv"
 	"strings"
@@ -50,7 +51,7 @@ func (t *Transpiler) init2() {
 		}
 	}
 	slices.SortFunc(pkgs, func(a, b *packages.Package) int {
-		if c := len(a.PkgPath) - len(b.PkgPath); c != 0 {
+		if c := cmp.Compare(len(a.PkgPath), len(b.PkgPath)); c != 0 {
 			return c
 		}
 		return strings.Compare(a.Name, b.Name)
