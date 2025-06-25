@@ -5,7 +5,7 @@ go 1.24.4
 tool github.com/antoniszymanski/mapcomments-go
 
 require (
-	github.com/alecthomas/kong v1.11.0
+	github.com/alecthomas/kong v1.12.0
 	github.com/antoniszymanski/sanefmt-go v0.2.2
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/fatih/structtag v1.2.0
