@@ -6,20 +6,15 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 package internal
 
-import "github.com/hashicorp/go-set/v3"
+import "github.com/antoniszymanski/tgtt-go/tgtt"
 
 //go:generate go tool mapcomments-go . . -P internal --mpl2
 
 type Config struct {
-	Format       bool              `yaml:"format"`
-	TypeMappings map[string]string `yaml:"type_mappings"`
-	Packages     []PkgConfig       `yaml:"packages"`
-}
-
-type PkgConfig struct {
-	Path              string            `yaml:"path"`
-	OutputPath        string            `yaml:"output_path"`
-	IncludeUnexported bool              `yaml:"include_unexported"`
-	Names             *set.Set[string]  `yaml:"names"`
-	TypeMappings      map[string]string `yaml:"type_mappings"`
+	Format            bool                  `yaml:"format"`
+	IncludeUnexported bool                  `yaml:"include_unexported"`
+	OutputPath        string                `yaml:"output_path"`
+	TypeMappings      map[string]string     `yaml:"type_mappings"`
+	PrimaryPackage    tgtt.PackageOptions   `yaml:"primary_package"`
+	SecondaryPackages []tgtt.PackageOptions `yaml:"secondary_packages"`
 }

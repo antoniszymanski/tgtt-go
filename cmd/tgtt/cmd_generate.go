@@ -9,8 +9,8 @@ package main
 import (
 	"bytes"
 	"io"
-	"maps"
 	"os"
+	"path/filepath"
 
 	"github.com/antoniszymanski/sanefmt-go"
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
@@ -41,42 +41,42 @@ func (c *cmdGenerate) Run() error {
 		return err
 	}
 
-	var postprocessors []tgtt.PostProcessor
+	var formatter tgtt.TsFormatter
 	if cfg.Format {
-		postprocessors = append(
-			postprocessors,
-			func(b []byte) ([]byte, error) {
-				b, err := sanefmt.Format(bytes.NewReader(b))
-				if err != nil {
-					return nil, err
-				}
-				return b, nil
-			},
-		)
+		formatter = func(b []byte) ([]byte, error) {
+			b, err := sanefmt.Format(bytes.NewReader(b))
+			if err != nil {
+				return nil, err
+			}
+			return b, nil
+		}
 	}
 
-	for _, pkgCfg := range cfg.Packages {
-		var opts []tgtt.TranspilerOption
-		{
-			typeMappings := make(map[string]string)
-			maps.Copy(typeMappings, cfg.TypeMappings)
-			maps.Copy(typeMappings, pkgCfg.TypeMappings)
-			opts = append(opts, tgtt.TypeMappings(typeMappings))
-		}
-		if pkgCfg.IncludeUnexported {
-			opts = append(opts, tgtt.IncludeUnexported())
-		}
+	pkg, err := tgtt.Transpile(tgtt.TranspileOptions{
+		PrimaryPackage:    cfg.PrimaryPackage,
+		SecondaryPackages: cfg.SecondaryPackages,
+		TypeMappings:      cfg.TypeMappings,
+		IncludeUnexported: cfg.IncludeUnexported,
+	})
+	if err != nil {
+		return err
+	}
 
-		t, err := tgtt.NewTranspiler(pkgCfg.Path, opts...)
-		if err != nil {
-			return err
-		}
-		t.Transpile(pkgCfg.Names)
-
-		err = t.Index().WriteTS(pkgCfg.OutputPath, postprocessors...)
-		if err != nil {
-			return err
-		}
+	if err = os.MkdirAll(cfg.OutputPath, 0750); err != nil {
+		return err
+	}
+	err = pkg.Render(tgtt.PackageRenderOptions{
+		Formatter: formatter,
+		Write: func(modName string, data []byte) error {
+			return os.WriteFile(
+				filepath.Join(cfg.OutputPath, modName+".ts"),
+				data,
+				0600,
+			)
+		},
+	})
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -12,6 +12,7 @@ import (
 
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
 	"github.com/goccy/go-yaml"
+	"github.com/hashicorp/go-set/v3"
 )
 
 type cmdInit struct {
@@ -51,5 +52,7 @@ func (c *cmdInit) Run() error {
 			return err
 		}
 	}
-	return yaml.NewEncoder(f, yaml.UseJSONMarshaler()).Encode(internal.Config{})
+	var cfg internal.Config
+	cfg.PrimaryPackage.Names = set.New[string](0)
+	return yaml.NewEncoder(f, yaml.UseJSONMarshaler()).Encode(cfg)
 }

@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func (t *Transpiler) transpileTypeRef(tname *types.TypeName, mod *Module) string {
+func (t *transpiler) transpileTypeRef(tname *types.TypeName, mod *TsModule) string {
 	if tname.Pkg() == nil {
 		switch tname.Name() {
 		case "comparable":
@@ -25,10 +25,9 @@ func (t *Transpiler) transpileTypeRef(tname *types.TypeName, mod *Module) string
 	}
 
 	pkg := t.packages[tname.Pkg().Path()]
-	typeMod := t.Modules[pkg.Name]
+	typeMod := t.modules[pkg.Name]
 	if typeMod == nil {
-		typeMod = newModule(pkg.PkgPath)
-		t.Modules[pkg.Name] = typeMod
+		typeMod = t.addModule(pkg.Name, pkg.PkgPath)
 	}
 
 	for _, obj := range sortedDefs(pkg) {
@@ -57,11 +56,11 @@ func (t *Transpiler) transpileTypeRef(tname *types.TypeName, mod *Module) string
 		return tname.Name()
 	} else {
 		mod.Imports.Set(pkg.Name, typeMod)
-		return tname.Pkg().Name() + "." + tname.Name()
+		return pkg.Name + "." + tname.Name()
 	}
 }
 
-func (t *Transpiler) transpileTypeArgs(targs *types.TypeList, mod *Module) string {
+func (t *transpiler) transpileTypeArgs(targs *types.TypeList, mod *TsModule) string {
 	var sb strings.Builder
 
 	if targs.Len() > 0 {
@@ -81,7 +80,7 @@ func (t *Transpiler) transpileTypeArgs(targs *types.TypeList, mod *Module) strin
 	return sb.String()
 }
 
-func (t *Transpiler) transpileTypeParams(tparams *types.TypeParamList, mod *Module) string {
+func (t *transpiler) transpileTypeParams(tparams *types.TypeParamList, mod *TsModule) string {
 	var sb strings.Builder
 
 	if tparams.Len() > 0 {
@@ -106,9 +105,9 @@ func (t *Transpiler) transpileTypeParams(tparams *types.TypeParamList, mod *Modu
 	return sb.String()
 }
 
-func (t *Transpiler) getPkgPath(obj types.Object) string {
+func (t *transpiler) getPkgPath(obj types.Object) string {
 	pkg := obj.Pkg()
-	if pkg == nil || pkg.Path() == t.pkg.PkgPath {
+	if pkg == nil || pkg.Path() == t.primaryPkg.PkgPath {
 		return obj.Name()
 	} else {
 		return pkg.Path() + "." + obj.Name()
