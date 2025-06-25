@@ -65,9 +65,7 @@ func (c *cmdGenerate) Run() error {
 		Formatter: formatter,
 		Write: func(modName string, data []byte) error {
 			return os.WriteFile(
-				filepath.Join(cfg.OutputPath, modName+".ts"),
-				data,
-				0600,
+				filepath.Join(cfg.OutputPath, modName+".ts"), data, 0600,
 			)
 		},
 	})
