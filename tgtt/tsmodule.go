@@ -21,13 +21,13 @@ type ModuleRenderOptions struct {
 type TsFormatter func([]byte) ([]byte, error)
 
 //go:embed tsmodule.go.tmpl
-var tmplSource string
+var tsmoduleTmplSource string
 
-var tmpl = template.Must(template.New("module").Parse(tmplSource))
+var tsmoduleTmpl = template.Must(template.New("tsmodule").Parse(tsmoduleTmplSource))
 
 func (m *TsModule) Render(opts ModuleRenderOptions) ([]byte, error) {
 	var buf bytes.Buffer
-	err := tmpl.Execute(&buf, m)
+	err := tsmoduleTmpl.Execute(&buf, m)
 	if err != nil {
 		return nil, err
 	}
