@@ -44,11 +44,7 @@ func (c *cmdGenerate) Run() error {
 	var formatter tgtt.TsFormatter
 	if cfg.Format {
 		formatter = func(b []byte) ([]byte, error) {
-			b, err := sanefmt.Format(bytes.NewReader(b))
-			if err != nil {
-				return nil, err
-			}
-			return b, nil
+			return sanefmt.Format(bytes.NewReader(b))
 		}
 	}
 
