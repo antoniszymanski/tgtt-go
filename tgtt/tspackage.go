@@ -9,7 +9,7 @@ func (p TsPackage) Index() *TsModule {
 }
 
 type PackageRenderOptions struct {
-	Formatter TsFormatter // through ModuleRenderOptions
+	Formatter TsFormatter // through [ModuleRenderOptions]
 	Write     func(modName string, data []byte) error
 }
 
