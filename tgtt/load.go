@@ -7,12 +7,27 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 package tgtt
 
 import (
+	"errors"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
 )
 
 func loadPackage(pattern string) (*packages.Package, error) {
+	// https://pkg.go.dev/cmd/go#hdr-Package_lists_and_patterns
+	// https://pkg.go.dev/golang.org/x/tools/go/packages#pkg-overview
+	switch pattern {
+	case "main", "pattern=main",
+		"all", "pattern=all",
+		"std", "pattern=std",
+		"cmd", "pattern=cmd",
+		"tool", "pattern=tool":
+		return nil, errors.New("pattern cannot be a reserved name")
+	}
+	if strings.Contains(pattern, "...") {
+		return nil, errors.New("pattern cannot contain wildcards")
+	}
+
 	cfg := &packages.Config{
 		Mode: packages.NeedName |
 			packages.NeedImports |
@@ -24,12 +39,13 @@ func loadPackage(pattern string) (*packages.Package, error) {
 	if err != nil {
 		return nil, err
 	}
+	pkg := pkgs[0]
 
-	if err = newPackageError(pkgs[0]); err != nil {
+	if err = newPackageError(pkg); err != nil {
 		return nil, err
 	}
 
-	return pkgs[0], nil
+	return pkg, nil
 }
 
 func newPackageError(pkg *packages.Package) error {
