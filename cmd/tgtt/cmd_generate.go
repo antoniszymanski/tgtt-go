@@ -8,7 +8,6 @@ package main
 
 import (
 	"bytes"
-	"io"
 	"os"
 	"path/filepath"
 
@@ -37,7 +36,7 @@ func (c *cmdGenerate) Run() error {
 
 	var cfg internal.Config
 	err = yaml.NewDecoder(f, yaml.UseJSONUnmarshaler()).Decode(&cfg)
-	if err != nil && err != io.EOF {
+	if err = formatYAMLError(err, true); err != nil {
 		return err
 	}
 

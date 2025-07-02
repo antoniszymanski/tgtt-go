@@ -54,5 +54,9 @@ func (c *cmdInit) Run() error {
 	}
 	var cfg internal.Config
 	cfg.PrimaryPackage.Names = set.New[string](0)
-	return yaml.NewEncoder(f, yaml.UseJSONMarshaler()).Encode(cfg)
+	err = yaml.NewEncoder(f, yaml.UseJSONMarshaler()).Encode(cfg)
+	if err = formatYAMLError(err, false); err != nil {
+		return err
+	}
+	return nil
 }
