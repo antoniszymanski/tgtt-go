@@ -7,5 +7,6 @@ linters:
     gosec:
       excludes:
         - G103
+        - G104
         - G107
         - G304
