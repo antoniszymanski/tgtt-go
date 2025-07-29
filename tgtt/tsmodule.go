@@ -23,7 +23,7 @@ type ModuleRenderOptions struct {
 
 type TsFormatter func([]byte) ([]byte, error)
 
-//go:embed tsmodule.go.tmpl
+//go:embed tsmodule.tmpl
 var tsmoduleTmplSource string
 
 var tsmoduleTmpl = template.Must(template.New("tsmodule").Parse(tsmoduleTmplSource))
