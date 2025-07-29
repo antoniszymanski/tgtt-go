@@ -2,8 +2,6 @@ module github.com/antoniszymanski/tgtt-go
 
 go 1.24.4
 
-tool github.com/antoniszymanski/mapcomments-go
-
 require (
 	github.com/alecthomas/kong v1.12.1
 	github.com/antoniszymanski/sanefmt-go v0.2.2
@@ -19,7 +17,6 @@ require (
 require (
 	codeberg.org/msantos/embedexe v0.0.0-20250421111610-c1538c66a2a1 // indirect
 	codeberg.org/msantos/execve v0.0.0-20230206112018-e5c3a7f4d436 // indirect
-	github.com/antoniszymanski/mapcomments-go v0.1.3 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect

@@ -8,8 +8,6 @@ github.com/alecthomas/kong v1.12.1 h1:iq6aMJDcFYP9uFrLdsiZQ2ZMmcshduyGv4Pek0MQPW
 github.com/alecthomas/kong v1.12.1/go.mod h1:p2vqieVMeTAnaC83txKtXe8FLke2X07aruPWXyMPQrU=
 github.com/alecthomas/repr v0.4.0 h1:GhI2A8MACjfegCPVq9f1FLvIBS+DrQ2KQBFZP1iFzXc=
 github.com/alecthomas/repr v0.4.0/go.mod h1:Fr0507jx4eOXV7AlPV6AVZLYrLIuIeSOWtW57eE/O/4=
-github.com/antoniszymanski/mapcomments-go v0.1.3 h1:A0e6kmiGlN/AXrpgqbmQ9nCpjkQWTElNZiqeKdpVxxY=
-github.com/antoniszymanski/mapcomments-go v0.1.3/go.mod h1:3r06L/t6+N7Sgau9d82ENZ47gQWZ+ugpIKVwn7VR9ak=
 github.com/antoniszymanski/sanefmt-go v0.2.2 h1:Nt47reEp4ilcUyJ9nAAqDwNQ19iBe/6aQDZjbB4FL+0=
 github.com/antoniszymanski/sanefmt-go v0.2.2/go.mod h1:o/aS43OPKxz8ozjsbExQrYMnTvW+kopeCe3QR/CxiR8=
 github.com/bahlo/generic-list-go v0.2.0 h1:5sz/EEAK+ls5wF+NeqDpk5+iNdMDXrh3z3nPnH1Wvgk=

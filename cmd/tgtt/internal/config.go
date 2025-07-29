@@ -8,7 +8,7 @@ package internal
 
 import "github.com/antoniszymanski/tgtt-go/tgtt"
 
-//go:generate go tool mapcomments-go . . -P internal --mpl2
+//go:generate go run ./schemagen
 
 type Config struct {
 	Format            bool                  `yaml:"format"`
