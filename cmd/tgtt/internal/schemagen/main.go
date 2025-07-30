@@ -4,8 +4,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"os"
 	"reflect"
@@ -36,13 +34,10 @@ func run() error {
 	}
 	schema := r.ReflectFromType(typ)
 
-	var buf bytes.Buffer
-	enc := json.NewEncoder(&buf)
-	enc.SetEscapeHTML(false)
-	if err := enc.Encode(schema); err != nil {
+	data, err := internal.MarshalJSON(schema)
+	if err != nil {
 		return err
 	}
-	data := bytes.TrimSuffix(buf.Bytes(), []byte("\n"))
 	return os.WriteFile("schema.json", data, 0600)
 }
 
