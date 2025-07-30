@@ -5,13 +5,14 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"path/filepath"
 
+	jsonc "github.com/DisposaBoy/JsonConfigReader"
 	"github.com/antoniszymanski/sanefmt-go"
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
 	"github.com/antoniszymanski/tgtt-go/tgtt"
-	"github.com/goccy/go-yaml"
 )
 
 type cmdGenerate struct {
@@ -32,8 +33,7 @@ func (c *cmdGenerate) Run() error {
 	}
 
 	var cfg internal.Config
-	err = yaml.NewDecoder(f, yaml.UseJSONUnmarshaler()).Decode(&cfg)
-	if err = formatYAMLError(err, true); err != nil {
+	if err = json.NewDecoder(jsonc.New(f)).Decode(&cfg); err != nil {
 		return err
 	}
 
@@ -57,7 +57,7 @@ func (c *cmdGenerate) Run() error {
 	if err = os.MkdirAll(cfg.OutputPath, 0750); err != nil {
 		return err
 	}
-	err = pkg.Render(tgtt.PackageRenderOptions{
+	return pkg.Render(tgtt.PackageRenderOptions{
 		Formatter: formatter,
 		Write: func(modName string, data []byte) error {
 			return os.WriteFile(
@@ -65,9 +65,4 @@ func (c *cmdGenerate) Run() error {
 			)
 		},
 	})
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

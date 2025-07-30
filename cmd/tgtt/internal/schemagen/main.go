@@ -18,7 +18,6 @@ import (
 func run() error {
 	r := jsonschema.Reflector{
 		Anonymous:                  true,
-		FieldNameTag:               "yaml",
 		RequiredFromJSONSchemaTags: true,
 		DoNotReference:             true,
 	}

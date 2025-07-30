@@ -4,16 +4,16 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
-	"github.com/goccy/go-yaml"
 	"github.com/hashicorp/go-set/v3"
 )
 
 type cmdInit struct {
-	Path       string `arg:"" type:"path" default:"tgtt.yml"`
+	Path       string `arg:"" type:"path" default:"tgtt.jsonc"`
 	SchemaPath string `arg:"" type:"path" default:"tgtt.schema.json"`
 	NoSchema   bool   `short:"S"`
 }
@@ -42,18 +42,14 @@ func (c *cmdInit) Run() error {
 		f = os.Stdout
 	}
 
-	if !c.NoSchema {
-		s := "# yaml-language-server: $schema=" + c.SchemaPath + "\n"
-		_, err = f.WriteString(s)
-		if err != nil {
-			return err
-		}
-	}
 	var cfg internal.Config
-	cfg.PrimaryPackage.Names = set.New[string](0)
-	err = yaml.NewEncoder(f, yaml.UseJSONMarshaler()).Encode(cfg)
-	if err = formatYAMLError(err, false); err != nil {
-		return err
+	if !c.NoSchema {
+		cfg.Schema = c.SchemaPath
 	}
-	return nil
+	cfg.PrimaryPackage.Names = set.New[string](0)
+
+	enc := json.NewEncoder(f)
+	enc.SetEscapeHTML(false)
+	enc.SetIndent("", "  ")
+	return enc.Encode(&cfg)
 }

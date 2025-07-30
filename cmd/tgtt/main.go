@@ -3,28 +3,13 @@
 
 package main
 
-import (
-	"errors"
-	"io"
-	"os"
-
-	"github.com/alecthomas/kong"
-	"github.com/goccy/go-yaml"
-)
+import "github.com/alecthomas/kong"
 
 type cli struct {
 	Init     cmdInit     `cmd:""`
 	Schema   cmdSchema   `cmd:""`
 	Generate cmdGenerate `cmd:""`
 	Version  cmdVersion  `cmd:""`
-}
-
-func formatYAMLError(err error, ignoreEOF bool) error {
-	if err == nil || (ignoreEOF && err == io.EOF) {
-		return nil
-	}
-	_, noColor := os.LookupEnv("NO_COLOR")
-	return errors.New(yaml.FormatError(err, !noColor, true))
 }
 
 func main() {

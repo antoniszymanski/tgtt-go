@@ -64,8 +64,8 @@ type TranspileOptions struct {
 }
 
 type PackageOptions struct {
-	Path  string           `yaml:"path"`
-	Names *set.Set[string] `yaml:"names"`
+	Path  string           `json:"path"`
+	Names *set.Set[string] `json:"names"`
 }
 
 func sortedDefs(pkg *packages.Package) []types.Object {
