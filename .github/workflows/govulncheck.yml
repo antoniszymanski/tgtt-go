@@ -1,4 +1,4 @@
-name: govulncheck
+name: Run govulncheck
 
 on:
   schedule:
@@ -14,14 +14,21 @@ on:
 
 jobs:
   govulncheck:
-    name: govulncheck
+    name: Run govulncheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
         shell: bash
-      - run: govulncheck ./...
+
+      - name: Run govulncheck
+        run: govulncheck ./...
         shell: bash
