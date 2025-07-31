@@ -1,0 +1,28 @@
+name: Create release notes
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release-notes:
+    name: Create release notes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate changelog
+        uses: mikepenz/release-changelog-builder-action@v5
+        id: changelog
+        with:
+          mode: COMMIT
+          configuration: .github/changelog-config.json
+
+      - name: Update release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{steps.changelog.outputs.changelog}}
