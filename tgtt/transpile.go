@@ -64,7 +64,7 @@ type TranspileOptions struct {
 }
 
 type PackageOptions struct {
-	Path  string           `json:"path"`
+	Path  string           `json:"path" jsonschema:"required,minLength=1"`
 	Names *set.Set[string] `json:"names"`
 }
 

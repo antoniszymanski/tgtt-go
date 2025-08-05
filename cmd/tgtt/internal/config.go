@@ -13,8 +13,8 @@ type Config struct {
 	Schema            string                     `json:"$schema,omitzero"`
 	Format            bool                       `json:"format"`
 	IncludeUnexported bool                       `json:"include_unexported"`
-	OutputPath        string                     `json:"output_path"`
+	OutputPath        string                     `json:"output_path" jsonschema:"required,minLength=1"`
 	TypeMappings      Object[string, string]     `json:"type_mappings"`
-	PrimaryPackage    tgtt.PackageOptions        `json:"primary_package"`
+	PrimaryPackage    tgtt.PackageOptions        `json:"primary_package" jsonschema:"required"`
 	SecondaryPackages Array[tgtt.PackageOptions] `json:"secondary_packages"`
 }

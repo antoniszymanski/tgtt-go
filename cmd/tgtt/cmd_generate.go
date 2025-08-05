@@ -6,6 +6,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -13,10 +14,11 @@ import (
 	"github.com/antoniszymanski/sanefmt-go"
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
 	"github.com/antoniszymanski/tgtt-go/tgtt"
+	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
 type cmdGenerate struct {
-	Path string `arg:"" type:"path" default:"tgtt.yml"`
+	Path string `arg:"" type:"path" default:"tgtt.jsonc"`
 }
 
 func (c *cmdGenerate) Run() error {
@@ -32,8 +34,33 @@ func (c *cmdGenerate) Run() error {
 		f = os.Stdin
 	}
 
+	data, err := io.ReadAll(jsonc.New(f))
+	if err != nil {
+		return err
+	}
+
+	doc, err := jsonschema.UnmarshalJSON(bytes.NewReader(schema))
+	if err != nil {
+		return err
+	}
+	compiler := jsonschema.NewCompiler()
+	if err = compiler.AddResource("memory:", doc); err != nil {
+		return err
+	}
+	sch, err := compiler.Compile("memory:")
+	if err != nil {
+		return err
+	}
+	inst, err := jsonschema.UnmarshalJSON(bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+	if err = sch.Validate(inst); err != nil {
+		return err
+	}
+
 	var cfg internal.Config
-	if err = json.NewDecoder(jsonc.New(f)).Decode(&cfg); err != nil {
+	if err = json.Unmarshal(data, &cfg); err != nil {
 		return err
 	}
 
