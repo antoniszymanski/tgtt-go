@@ -8,6 +8,7 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/config"
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
 	"github.com/hashicorp/go-set/v3"
 	"github.com/invopop/jsonschema"
@@ -22,13 +23,13 @@ func run() error {
 	setType := reflect.TypeFor[set.Set[string]]()
 	r.Mapper = func(t reflect.Type) *jsonschema.Schema {
 		if t == setType {
-			schema := r.Reflect([]string(nil))
+			schema := r.ReflectFromType(reflect.TypeFor[[]string]())
 			schema.Version = ""
 			return schema
 		}
 		return nil
 	}
-	typ := reflect.TypeFor[internal.Config]()
+	typ := reflect.TypeFor[config.Config]()
 	if err := r.AddGoComments(typ.PkgPath(), "."); err != nil {
 		return err
 	}

@@ -5,16 +5,14 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"io"
 	"os"
 	"path/filepath"
 
 	jsonc "github.com/DisposaBoy/JsonConfigReader"
 	"github.com/antoniszymanski/sanefmt-go"
-	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
+	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/config"
 	"github.com/antoniszymanski/tgtt-go/tgtt"
-	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
 type cmdGenerate struct {
@@ -38,29 +36,8 @@ func (c *cmdGenerate) Run() error {
 	if err != nil {
 		return err
 	}
-
-	doc, err := jsonschema.UnmarshalJSON(bytes.NewReader(schema))
-	if err != nil {
-		return err
-	}
-	compiler := jsonschema.NewCompiler()
-	if err = compiler.AddResource("memory:", doc); err != nil {
-		return err
-	}
-	sch, err := compiler.Compile("memory:")
-	if err != nil {
-		return err
-	}
-	inst, err := jsonschema.UnmarshalJSON(bytes.NewReader(data))
-	if err != nil {
-		return err
-	}
-	if err = sch.Validate(inst); err != nil {
-		return err
-	}
-
-	var cfg internal.Config
-	if err = json.Unmarshal(data, &cfg); err != nil {
+	var cfg config.Config
+	if err = cfg.UnmarshalJSON(data); err != nil {
 		return err
 	}
 

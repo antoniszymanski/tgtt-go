@@ -7,14 +7,13 @@ import (
 	_ "embed"
 	"os"
 	"path/filepath"
+
+	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/config"
 )
 
 type cmdSchema struct {
 	Path string `arg:"" type:"path" default:"tgtt.schema.json"`
 }
-
-//go:embed internal/schema.json
-var schema []byte
 
 func (c *cmdSchema) Run() error {
 	var f *os.File
@@ -32,6 +31,6 @@ func (c *cmdSchema) Run() error {
 		f = os.Stdout
 	}
 
-	_, err = f.Write(schema)
+	_, err = f.Write(config.Schema())
 	return err
 }

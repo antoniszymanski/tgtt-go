@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
+	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/config"
 	"github.com/hashicorp/go-set/v3"
 )
 
@@ -42,7 +42,7 @@ func (c *cmdInit) Run() error {
 		f = os.Stdout
 	}
 
-	var cfg internal.Config
+	var cfg config.Config
 	if !c.NoSchema {
 		cfg.Schema = c.SchemaPath
 	}
