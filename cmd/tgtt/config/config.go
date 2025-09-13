@@ -8,6 +8,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"strings"
+	"sync"
 	"unsafe"
 
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
@@ -26,15 +27,7 @@ type Config struct {
 }
 
 func (c *Config) UnmarshalJSON(data []byte) error {
-	doc, err := jsonschema.UnmarshalJSON(strings.NewReader(schema))
-	if err != nil {
-		return err
-	}
-	compiler := jsonschema.NewCompiler()
-	if err = compiler.AddResource("memory:", doc); err != nil {
-		return err
-	}
-	sch, err := compiler.Compile("memory:")
+	sch, err := compiledSchema()
 	if err != nil {
 		return err
 	}
@@ -47,7 +40,20 @@ func (c *Config) UnmarshalJSON(data []byte) error {
 	}
 	type RawConfig Config
 	return json.Unmarshal(data, (*RawConfig)(c))
+
 }
+
+var compiledSchema = sync.OnceValues(func() (*jsonschema.Schema, error) {
+	doc, err := jsonschema.UnmarshalJSON(strings.NewReader(schema))
+	if err != nil {
+		return nil, err
+	}
+	compiler := jsonschema.NewCompiler()
+	if err = compiler.AddResource("memory:", doc); err != nil {
+		return nil, err
+	}
+	return compiler.Compile("memory:")
+})
 
 //go:generate go run ../internal/schemagen
 
