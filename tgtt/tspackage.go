@@ -12,8 +12,7 @@ func (p TsPackage) Index() *TsModule {
 }
 
 type PackageRenderOptions struct {
-	Formatter TsFormatter // through [ModuleRenderOptions]
-	Write     func(modName string, data []byte) error
+	Write func(modName string, data []byte) error
 }
 
 func (p TsPackage) Render(opts PackageRenderOptions) error {
@@ -26,9 +25,7 @@ func (p TsPackage) Render(opts PackageRenderOptions) error {
 			if err != nil {
 				return
 			}
-			data, localErr := mod.Render(ModuleRenderOptions{
-				Formatter: opts.Formatter,
-			})
+			data, localErr := mod.Render()
 			if localErr != nil {
 				err = localErr
 				return

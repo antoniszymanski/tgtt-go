@@ -41,13 +41,6 @@ func (c *cmdGenerate) Run() error {
 		return err
 	}
 
-	var formatter tgtt.TsFormatter
-	if cfg.Format {
-		formatter = func(b []byte) ([]byte, error) {
-			return sanefmt.Format(bytes.NewReader(b))
-		}
-	}
-
 	pkg, err := tgtt.Transpile(tgtt.TranspileOptions{
 		PrimaryPackage:    cfg.PrimaryPackage,
 		SecondaryPackages: cfg.SecondaryPackages,
@@ -62,8 +55,13 @@ func (c *cmdGenerate) Run() error {
 		return err
 	}
 	return pkg.Render(tgtt.PackageRenderOptions{
-		Formatter: formatter,
-		Write: func(modName string, data []byte) error {
+		Write: func(modName string, data []byte) (err error) {
+			if cfg.Format {
+				data, err = sanefmt.Format(bytes.NewReader(data))
+				if err != nil {
+					return err
+				}
+			}
 			return os.WriteFile(filepath.Join(cfg.OutputPath, modName+".ts"), data, 0600)
 		},
 	})
