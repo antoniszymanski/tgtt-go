@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/antoniszymanski/loadpackage-go"
 	"github.com/fatih/structtag"
 	"github.com/hashicorp/go-set/v3"
 	"github.com/lindell/go-ordered-set/orderedset"
@@ -24,13 +25,20 @@ func Transpile(opts TranspileOptions) (TsPackage, error) {
 		typeMappings:      opts.TypeMappings,
 		includeUnexported: opts.IncludeUnexported,
 	}
+	cfg := &packages.Config{
+		Mode: packages.NeedName |
+			packages.NeedImports |
+			packages.NeedDeps |
+			packages.NeedTypes |
+			packages.NeedTypesInfo,
+	}
 	var err error
-	t.primaryPkg, err = loadPackage(opts.PrimaryPackage.Path)
+	t.primaryPkg, err = loadpackage.Load(opts.PrimaryPackage.Path, cfg)
 	if err != nil {
 		return nil, err
 	}
 	for _, pkgOpts := range opts.SecondaryPackages {
-		pkg, err := loadPackage(pkgOpts.Path)
+		pkg, err := loadpackage.Load(pkgOpts.Path, cfg)
 		if err != nil {
 			return nil, err
 		}

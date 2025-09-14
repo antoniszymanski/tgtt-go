@@ -10,6 +10,8 @@ github.com/alecthomas/kong v1.12.1 h1:iq6aMJDcFYP9uFrLdsiZQ2ZMmcshduyGv4Pek0MQPW
 github.com/alecthomas/kong v1.12.1/go.mod h1:p2vqieVMeTAnaC83txKtXe8FLke2X07aruPWXyMPQrU=
 github.com/alecthomas/repr v0.4.0 h1:GhI2A8MACjfegCPVq9f1FLvIBS+DrQ2KQBFZP1iFzXc=
 github.com/alecthomas/repr v0.4.0/go.mod h1:Fr0507jx4eOXV7AlPV6AVZLYrLIuIeSOWtW57eE/O/4=
+github.com/antoniszymanski/loadpackage-go v0.1.0 h1:xEfztd311ul4o+gzAPPa62ejdlY57bVTyGb0LSKw9Gg=
+github.com/antoniszymanski/loadpackage-go v0.1.0/go.mod h1:6+ilkplzIZi1TaCsMgPSM7lRvVuhhqyqgGgH2Oqf/Eg=
 github.com/antoniszymanski/sanefmt-go v0.2.3 h1:n4CUvUNbqVyvtKxge0WRIRHv6ZuowY/gANPFBbANM+I=
 github.com/antoniszymanski/sanefmt-go v0.2.3/go.mod h1:o/aS43OPKxz8ozjsbExQrYMnTvW+kopeCe3QR/CxiR8=
 github.com/bahlo/generic-list-go v0.2.0 h1:5sz/EEAK+ls5wF+NeqDpk5+iNdMDXrh3z3nPnH1Wvgk=
