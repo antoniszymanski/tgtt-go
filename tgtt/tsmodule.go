@@ -34,7 +34,6 @@ func (m *TsModule) Render(opts ModuleRenderOptions) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	data := buf.Bytes()
 	if opts.Formatter != nil {
 		data, err = opts.Formatter(data)
@@ -42,6 +41,5 @@ func (m *TsModule) Render(opts ModuleRenderOptions) ([]byte, error) {
 			return nil, err
 		}
 	}
-
 	return data, nil
 }

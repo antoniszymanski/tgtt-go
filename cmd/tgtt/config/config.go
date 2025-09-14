@@ -40,7 +40,6 @@ func (c *Config) UnmarshalJSON(data []byte) error {
 	}
 	type RawConfig Config
 	return json.Unmarshal(data, (*RawConfig)(c))
-
 }
 
 var compiledSchema = sync.OnceValues(func() (*jsonschema.Schema, error) {

@@ -295,15 +295,12 @@ func (t *transpiler) transpileSlice(typ *types.Slice, mod *TsModule) string {
 }
 
 func (t *transpiler) transpileMap(typ *types.Map, mod *TsModule) string {
-	return fmt.Sprintf(
-		`{ [key in string]: %s }`, t.transpileType(typ.Elem(), mod),
-	)
+	return fmt.Sprintf(`{ [key in string]: %s }`, t.transpileType(typ.Elem(), mod))
 }
 
 func (t *transpiler) transpileStruct(typ *types.Struct, mod *TsModule) string {
-	var sb strings.Builder
 	s := parseStruct(typ)
-
+	var sb strings.Builder
 	sb.WriteByte('{')
 	if len(s.Fields) > 0 {
 		sb.WriteByte(' ')
@@ -321,10 +318,8 @@ func (t *transpiler) transpileStruct(typ *types.Struct, mod *TsModule) string {
 		)
 	}
 	sb.WriteByte('}')
-
 	for _, embed := range s.Embeds {
 		sb.WriteString(" & ")
-
 		typStr := t.transpileType(embed.Type, mod)
 		typStr, found := strings.CutSuffix(typStr, " | null")
 		if !embed.Optional && !found {
@@ -333,7 +328,6 @@ func (t *transpiler) transpileStruct(typ *types.Struct, mod *TsModule) string {
 			sb.WriteString("Partial<" + typStr + ">")
 		}
 	}
-
 	return sb.String()
 }
 
@@ -354,7 +348,6 @@ func parseStruct(typ *types.Struct) structData {
 		if !field.Exported() {
 			continue
 		}
-
 		var f fieldData
 		embedded := field.Embedded()
 		func() {
@@ -363,13 +356,11 @@ func parseStruct(typ *types.Struct) structData {
 				f.Name = field.Name()
 				return
 			}
-
 			tag, err := tags.Get("json")
 			if err != nil {
 				f.Name = field.Name()
 				return
 			}
-
 			f.Name = tag.Name
 			f.Optional = tag.HasOption("omitempty")
 			if !embedded {
@@ -379,7 +370,6 @@ func parseStruct(typ *types.Struct) structData {
 		if f.Name == "-" {
 			continue
 		}
-
 		f.Type = field.Type()
 		if !embedded {
 			s.Fields = append(s.Fields, f)
@@ -387,7 +377,6 @@ func parseStruct(typ *types.Struct) structData {
 			s.Embeds = append(s.Embeds, f)
 		}
 	}
-
 	return s
 }
 
@@ -411,7 +400,6 @@ func (t *transpiler) transpileInterface(typ *types.Interface, mod *TsModule) str
 		}
 		return dest
 	}
-
 	var unions [][]types.Type
 	for e := range typ.EmbeddedTypes() {
 		var terms []types.Type
@@ -428,14 +416,12 @@ func (t *transpiler) transpileInterface(typ *types.Interface, mod *TsModule) str
 	if len(unions) == 0 {
 		return "any"
 	}
-
 	for _, y := range unions[1:] {
 		unions[0] = intersect(unions[0], y)
 	}
 	if len(unions[0]) == 0 {
 		return "any"
 	}
-
 	terms := orderedset.New[string]()
 	for _, termTyp := range unions[0] {
 		terms.Add(t.transpileType(termTyp, mod))
@@ -448,7 +434,6 @@ func (t *transpiler) transpileUnion(typ *types.Union, mod *TsModule) string {
 	for term := range typ.Terms() {
 		terms.Add(t.transpileType(term.Type(), mod))
 	}
-
 	if terms.Size() == 0 {
 		return "any"
 	}

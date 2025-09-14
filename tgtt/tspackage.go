@@ -26,7 +26,6 @@ func (p TsPackage) Render(opts PackageRenderOptions) error {
 			if err != nil {
 				return
 			}
-
 			data, localErr := mod.Render(ModuleRenderOptions{
 				Formatter: opts.Formatter,
 			})
@@ -34,14 +33,12 @@ func (p TsPackage) Render(opts PackageRenderOptions) error {
 				err = localErr
 				return
 			}
-
 			localErr = opts.Write(modName, data)
 			if localErr != nil {
 				err = localErr
 			}
 		}()
 	}
-
 	wg.Wait()
 	return err
 }

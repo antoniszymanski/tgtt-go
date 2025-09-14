@@ -34,7 +34,6 @@ func (t *transpiler) init1() {
 	for len(stack) > 0 {
 		current := stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
-
 		t.packages[current.PkgPath] = current
 		for _, importedPkg := range current.Imports {
 			if _, ok := t.packages[importedPkg.PkgPath]; ok {
@@ -65,7 +64,6 @@ func (t *transpiler) init2() {
 		}
 		return strings.Compare(a.Name, b.Name)
 	})
-
 	names := set.New[string](0)
 	for _, pkg := range pkgs {
 		if names.Contains(pkg.Name) {
@@ -83,7 +81,6 @@ func (t *transpiler) init2() {
 		}
 		names.Insert(pkg.Name)
 	}
-
 	t.primaryPkg.Name = "index"
 }
 

@@ -33,15 +33,12 @@ func (t *transpiler) transpileTypeRef(tname *types.TypeName, mod *TsModule) stri
 			if !ok {
 				return false
 			}
-
 			typ, ok := obj.Type().(*types.Named)
 			if !ok {
 				return false
 			}
-
 			return t.getPkgPath(tname) == t.getPkgPath(typ.Obj())
 		}()
-
 		if obj.Name() == tname.Name() {
 			t.transpileObject(obj, typeMod)
 		} else if isMatchingConstType && (obj.Exported() || t.includeUnexported) {
@@ -59,7 +56,6 @@ func (t *transpiler) transpileTypeRef(tname *types.TypeName, mod *TsModule) stri
 
 func (t *transpiler) transpileTypeArgs(targs *types.TypeList, mod *TsModule) string {
 	var sb strings.Builder
-
 	if targs.Len() > 0 {
 		sb.WriteByte('<')
 	}
@@ -73,13 +69,11 @@ func (t *transpiler) transpileTypeArgs(targs *types.TypeList, mod *TsModule) str
 	if targs.Len() > 0 {
 		sb.WriteByte('>')
 	}
-
 	return sb.String()
 }
 
 func (t *transpiler) transpileTypeParams(tparams *types.TypeParamList, mod *TsModule) string {
 	var sb strings.Builder
-
 	if tparams.Len() > 0 {
 		sb.WriteByte('<')
 	}
@@ -98,7 +92,6 @@ func (t *transpiler) transpileTypeParams(tparams *types.TypeParamList, mod *TsMo
 	if tparams.Len() > 0 {
 		sb.WriteByte('>')
 	}
-
 	return sb.String()
 }
 
