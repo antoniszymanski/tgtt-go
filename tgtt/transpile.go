@@ -362,7 +362,7 @@ func parseStruct(typ *types.Struct) structData {
 				return
 			}
 			f.Name = tag.Name
-			f.Optional = tag.HasOption("omitempty")
+			f.Optional = tag.HasOption("omitempty") || tag.HasOption("omitzero")
 			if !embedded {
 				embedded = tag.HasOption("inline")
 			}
