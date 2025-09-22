@@ -8,7 +8,6 @@ import (
 	"slices"
 	"strconv"
 	"strings"
-	"unsafe"
 
 	"github.com/elliotchance/orderedmap/v3"
 	"github.com/hashicorp/go-set/v3"
@@ -73,19 +72,15 @@ func (t *transpiler) init2() {
 			for i := uint64(1); ; i++ {
 				name = name[:len(pkg.Name)+1]
 				name = strconv.AppendUint(name, i, 10)
-				if !names.Contains(b2s(name)) {
+				if !names.Contains(string(name)) {
 					break
 				}
 			}
-			pkg.Name = b2s(name)
+			pkg.Name = bytesToString(name)
 		}
 		names.Insert(pkg.Name)
 	}
 	t.primaryPkg.Name = "index"
-}
-
-func b2s(b []byte) string {
-	return unsafe.String(unsafe.SliceData(b), len(b))
 }
 
 func (t *transpiler) init3() {
