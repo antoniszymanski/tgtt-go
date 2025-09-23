@@ -17,8 +17,6 @@ type TsModule struct {
 	Defs    *orderedmap.OrderedMap[string, string]
 }
 
-type TsFormatter func([]byte) ([]byte, error)
-
 //go:embed tsmodule.tmpl
 var tsmoduleTmplSource string
 
