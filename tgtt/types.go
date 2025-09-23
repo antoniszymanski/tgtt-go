@@ -54,9 +54,10 @@ func (t *transpiler) transpileTypeRef(dst []byte, tname *types.TypeName, mod *Ts
 }
 
 func (t *transpiler) transpileTypeArgs(dst []byte, targs *types.TypeList, mod *TsModule) []byte {
-	if targs.Len() > 0 {
-		dst = append(dst, '<')
+	if targs.Len() == 0 {
+		return dst
 	}
+	dst = append(dst, '<')
 	for i := range targs.Len() {
 		targ := targs.At(i)
 		dst = t.transpileType(dst, targ, mod)
@@ -64,16 +65,15 @@ func (t *transpiler) transpileTypeArgs(dst []byte, targs *types.TypeList, mod *T
 			dst = append(dst, ", "...)
 		}
 	}
-	if targs.Len() > 0 {
-		dst = append(dst, '>')
-	}
+	dst = append(dst, '>')
 	return dst
 }
 
 func (t *transpiler) transpileTypeParams(dst []byte, tparams *types.TypeParamList, mod *TsModule) []byte {
-	if tparams.Len() > 0 {
-		dst = append(dst, '<')
+	if tparams.Len() == 0 {
+		return dst
 	}
+	dst = append(dst, '<')
 	for i := range tparams.Len() {
 		tparam := tparams.At(i)
 		dst = append(dst, tparam.Obj().Name()...)
@@ -83,9 +83,7 @@ func (t *transpiler) transpileTypeParams(dst []byte, tparams *types.TypeParamLis
 			dst = append(dst, ", "...)
 		}
 	}
-	if tparams.Len() > 0 {
-		dst = append(dst, '>')
-	}
+	dst = append(dst, '>')
 	return dst
 }
 
