@@ -12,11 +12,15 @@ func (p TsPackage) Index() *TsModule {
 }
 
 type PackageRenderOptions struct {
+	Limit int
 	Write func(modName string, data []byte) error
 }
 
 func (p TsPackage) Render(opts PackageRenderOptions) error {
 	var g errgroup.Group
+	if opts.Limit != 0 {
+		g.SetLimit(opts.Limit)
+	}
 	for modName, mod := range p {
 		g.Go(func() error {
 			data, err := mod.Render()
