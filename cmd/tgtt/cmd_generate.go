@@ -51,6 +51,7 @@ func (c *cmdGenerate) Run() error {
 		return err
 	}
 
+	cfg.OutputPath = filepath.Clean(cfg.OutputPath)
 	if err = os.MkdirAll(cfg.OutputPath, 0750); err != nil {
 		return err
 	}
@@ -62,7 +63,8 @@ func (c *cmdGenerate) Run() error {
 					return err
 				}
 			}
-			return os.WriteFile(filepath.Join(cfg.OutputPath, moduleName+".ts"), data, 0600)
+			path := cfg.OutputPath + string(filepath.Separator) + moduleName + ".ts"
+			return os.WriteFile(path, data, 0600)
 		},
 	})
 }
