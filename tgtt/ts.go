@@ -16,7 +16,7 @@ func (p Package) Index() *Module {
 
 type RenderOptions struct {
 	Limit int
-	Write func(modName string, data []byte) error
+	Write func(moduleName string, data []byte) error
 }
 
 func (p Package) Render(opts RenderOptions) error {
@@ -24,9 +24,9 @@ func (p Package) Render(opts RenderOptions) error {
 	if opts.Limit != 0 {
 		g.SetLimit(opts.Limit)
 	}
-	for modName, mod := range p {
+	for moduleName, mod := range p {
 		g.Go(func() error {
-			return opts.Write(modName, mod.Render())
+			return opts.Write(moduleName, mod.Render())
 		})
 	}
 	return g.Wait()

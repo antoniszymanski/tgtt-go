@@ -55,14 +55,14 @@ func (c *cmdGenerate) Run() error {
 		return err
 	}
 	return pkg.Render(tgtt.RenderOptions{
-		Write: func(modName string, data []byte) (err error) {
+		Write: func(moduleName string, data []byte) (err error) {
 			if cfg.Format {
 				data, err = sanefmt.Format(bytes.NewReader(data))
 				if err != nil {
 					return err
 				}
 			}
-			return os.WriteFile(filepath.Join(cfg.OutputPath, modName+".ts"), data, 0600)
+			return os.WriteFile(filepath.Join(cfg.OutputPath, moduleName+".ts"), data, 0600)
 		},
 	})
 }
