@@ -3,7 +3,7 @@
 
 package tgtt
 
-import "sync"
+import "golang.org/x/sync/errgroup"
 
 type TsPackage map[string]*TsModule // Keyed by module name
 
@@ -16,26 +16,15 @@ type PackageRenderOptions struct {
 }
 
 func (p TsPackage) Render(opts PackageRenderOptions) error {
-	var wg sync.WaitGroup
-	var err error
+	var g errgroup.Group
 	for modName, mod := range p {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		g.Go(func() error {
+			data, err := mod.Render()
 			if err != nil {
-				return
+				return err
 			}
-			data, localErr := mod.Render()
-			if localErr != nil {
-				err = localErr
-				return
-			}
-			localErr = opts.Write(modName, data)
-			if localErr != nil {
-				err = localErr
-			}
-		}()
+			return opts.Write(modName, data)
+		})
 	}
-	wg.Wait()
-	return err
+	return g.Wait()
 }
