@@ -43,12 +43,12 @@ func (m *Module) Render() []byte {
 	b = append(b, "/* "...)
 	b = append(b, m.GoPath...)
 	b = append(b, " */"...)
-	for path := range m.Imports.Keys() {
+	for moduleName := range m.Imports.Keys() {
 		b = append(b, '\n')
 		b = append(b, "import * as "...)
-		b = append(b, path...)
+		b = append(b, moduleName...)
 		b = append(b, ` from "./`...)
-		b = append(b, path...)
+		b = append(b, moduleName...)
 		b = append(b, `";`...)
 	}
 	for def := range m.Defs.Values() {
