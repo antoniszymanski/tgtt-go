@@ -30,34 +30,20 @@ func transpileExpr(dst []byte, expr ast.Expr) ([]byte, error) {
 		return transpileArrayType(dst, expr)
 	case *ast.BadExpr:
 		return transpileBadExpr(dst, expr)
-	// case *ast.BasicLit:
-	// case *ast.BinaryExpr:
-	// case *ast.CallExpr:
-	// case *ast.ChanType:
-	// case *ast.CompositeLit:
-	// case *ast.Ellipsis:
-	// case *ast.FuncLit:
-	// case *ast.FuncType:
 	case *ast.Ident:
 		return transpileIdent(dst, expr)
-	// case *ast.IndexExpr:
-	// case *ast.IndexListExpr:
 	case *ast.InterfaceType:
 		return transpileInterfaceType(dst, expr)
-	// case *ast.KeyValueExpr:
 	case *ast.MapType:
 		return transpileMapType(dst, expr)
 	case *ast.ParenExpr:
 		return transpileParenExpr(dst, expr)
 	case *ast.SelectorExpr:
 		return transpileSelectorExpr(dst, expr)
-	// case *ast.SliceExpr:
 	case *ast.StarExpr:
 		return transpileStarExpr(dst, expr)
 	case *ast.StructType:
 		return transpileStructType(dst, expr)
-	// case *ast.TypeAssertExpr:
-	// case *ast.UnaryExpr:
 	default:
 		err := reflect.TypeOf(expr).Elem().Name() + ": unsupported expression type"
 		return nil, errors.New(err)
