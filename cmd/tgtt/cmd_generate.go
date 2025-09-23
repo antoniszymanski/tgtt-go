@@ -54,7 +54,7 @@ func (c *cmdGenerate) Run() error {
 	if err = os.MkdirAll(cfg.OutputPath, 0750); err != nil {
 		return err
 	}
-	return pkg.Render(tgtt.PackageRenderOptions{
+	return pkg.Render(tgtt.RenderOptions{
 		Write: func(modName string, data []byte) (err error) {
 			if cfg.Format {
 				data, err = sanefmt.Format(bytes.NewReader(data))

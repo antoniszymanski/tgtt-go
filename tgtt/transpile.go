@@ -18,7 +18,7 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-func Transpile(opts TranspileOptions) (TsPackage, error) {
+func Transpile(opts TranspileOptions) (Package, error) {
 	t := &transpiler{
 		typeMappings:      opts.TypeMappings,
 		includeUnexported: opts.IncludeUnexported,
@@ -116,7 +116,7 @@ type transpilableType interface {
 	TypeParams() *types.TypeParamList
 }
 
-func (t *transpiler) transpileObject(obj types.Object, mod *TsModule) {
+func (t *transpiler) transpileObject(obj types.Object, mod *Module) {
 	if mod.Defs.Has(obj.Name()) {
 		return
 	}
@@ -129,7 +129,7 @@ func (t *transpiler) transpileObject(obj types.Object, mod *TsModule) {
 	}
 }
 
-func (t *transpiler) transpileConst(obj *types.Const, mod *TsModule) {
+func (t *transpiler) transpileConst(obj *types.Const, mod *Module) {
 	mod.Defs.Set(obj.Name(), "") // prevent infinite recursion
 	def := append([]byte(nil), "export const "...)
 	def = append(def, obj.Name()...)
@@ -182,7 +182,7 @@ func transpileConstVal(dst []byte, x constant.Value, allowBigint bool) ([]byte, 
 	}
 }
 
-func (t *transpiler) transpileTypeDef(obj *types.TypeName, mod *TsModule) {
+func (t *transpiler) transpileTypeDef(obj *types.TypeName, mod *Module) {
 	typ, ok := obj.Type().(transpilableType)
 	if !ok {
 		return
@@ -201,7 +201,7 @@ func (t *transpiler) transpileTypeDef(obj *types.TypeName, mod *TsModule) {
 	mod.Defs.Set(obj.Name(), bytesToString(def))
 }
 
-func (t *transpiler) transpileType(dst []byte, typ types.Type, mod *TsModule) []byte {
+func (t *transpiler) transpileType(dst []byte, typ types.Type, mod *Module) []byte {
 	// https://github.com/golang/example/tree/master/gotypes#types
 	switch typ := typ.(type) {
 	case *types.Basic:
@@ -231,7 +231,7 @@ func (t *transpiler) transpileType(dst []byte, typ types.Type, mod *TsModule) []
 	}
 }
 
-func (t *transpiler) transpileBasic(dst []byte, typ *types.Basic, _ *TsModule) (ret []byte) {
+func (t *transpiler) transpileBasic(dst []byte, typ *types.Basic, _ *Module) (ret []byte) {
 	switch typ.Kind() {
 	case types.Bool:
 		return append(dst, "boolean"...)
@@ -268,7 +268,7 @@ func (t *transpiler) transpileBasic(dst []byte, typ *types.Basic, _ *TsModule) (
 	}
 }
 
-func (t *transpiler) transpilePointer(dst []byte, typ *types.Pointer, mod *TsModule) []byte {
+func (t *transpiler) transpilePointer(dst []byte, typ *types.Pointer, mod *Module) []byte {
 	dst = t.transpileType(dst, typ.Elem(), mod)
 	if !bytes.HasSuffix(dst, []byte(" | null")) {
 		dst = append(dst, " | null"...)
@@ -276,26 +276,26 @@ func (t *transpiler) transpilePointer(dst []byte, typ *types.Pointer, mod *TsMod
 	return dst
 }
 
-func (t *transpiler) transpileArray(dst []byte, typ *types.Array, mod *TsModule) []byte {
+func (t *transpiler) transpileArray(dst []byte, typ *types.Array, mod *Module) []byte {
 	dst = t.transpileType(dst, typ.Elem(), mod)
 	dst = append(dst, "[]"...)
 	return dst
 }
 
-func (t *transpiler) transpileSlice(dst []byte, typ *types.Slice, mod *TsModule) []byte {
+func (t *transpiler) transpileSlice(dst []byte, typ *types.Slice, mod *Module) []byte {
 	dst = t.transpileType(dst, typ.Elem(), mod)
 	dst = append(dst, "[]"...)
 	return dst
 }
 
-func (t *transpiler) transpileMap(dst []byte, typ *types.Map, mod *TsModule) []byte {
+func (t *transpiler) transpileMap(dst []byte, typ *types.Map, mod *Module) []byte {
 	dst = append(dst, "{ [key in string]: "...)
 	dst = t.transpileType(dst, typ.Elem(), mod)
 	dst = append(dst, " }"...)
 	return dst
 }
 
-func (t *transpiler) transpileStruct(dst []byte, typ *types.Struct, mod *TsModule) []byte {
+func (t *transpiler) transpileStruct(dst []byte, typ *types.Struct, mod *Module) []byte {
 	s := parseStruct(typ)
 	dst = append(dst, '{')
 	if len(s.Fields) > 0 {
@@ -351,19 +351,19 @@ func parseStruct(typ *types.Struct) structInfo[types.Type] {
 	return s
 }
 
-func (t *transpiler) transpileAlias(dst []byte, typ *types.Alias, mod *TsModule) []byte {
+func (t *transpiler) transpileAlias(dst []byte, typ *types.Alias, mod *Module) []byte {
 	dst = t.transpileTypeRef(dst, typ.Obj(), mod)
 	dst = t.transpileTypeArgs(dst, typ.TypeArgs(), mod)
 	return dst
 }
 
-func (t *transpiler) transpileNamed(dst []byte, typ *types.Named, mod *TsModule) []byte {
+func (t *transpiler) transpileNamed(dst []byte, typ *types.Named, mod *Module) []byte {
 	dst = t.transpileTypeRef(dst, typ.Obj(), mod)
 	dst = t.transpileTypeArgs(dst, typ.TypeArgs(), mod)
 	return dst
 }
 
-func (t *transpiler) transpileInterface(dst []byte, typ *types.Interface, mod *TsModule) []byte {
+func (t *transpiler) transpileInterface(dst []byte, typ *types.Interface, mod *Module) []byte {
 	intersect := func(a, b []types.Type) []types.Type {
 		var dest []types.Type
 		for _, x := range a {
@@ -411,7 +411,7 @@ func (t *transpiler) transpileInterface(dst []byte, typ *types.Interface, mod *T
 	return dst
 }
 
-func (t *transpiler) transpileUnion(dst []byte, typ *types.Union, mod *TsModule) []byte {
+func (t *transpiler) transpileUnion(dst []byte, typ *types.Union, mod *Module) []byte {
 	if typ.Len() == 0 {
 		return append(dst, "any"...)
 	}
@@ -429,6 +429,6 @@ func (t *transpiler) transpileUnion(dst []byte, typ *types.Union, mod *TsModule)
 	return dst
 }
 
-func (t *transpiler) transpileTypeParam(dst []byte, typ *types.TypeParam, _ *TsModule) []byte {
+func (t *transpiler) transpileTypeParam(dst []byte, typ *types.TypeParam, _ *Module) []byte {
 	return append(dst, typ.Obj().Name()...)
 }

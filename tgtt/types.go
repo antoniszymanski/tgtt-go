@@ -5,7 +5,7 @@ package tgtt
 
 import "go/types"
 
-func (t *transpiler) transpileTypeRef(dst []byte, tname *types.TypeName, mod *TsModule) []byte {
+func (t *transpiler) transpileTypeRef(dst []byte, tname *types.TypeName, mod *Module) []byte {
 	if tname.Pkg() == nil {
 		switch tname.Name() {
 		case "comparable":
@@ -53,7 +53,7 @@ func (t *transpiler) transpileTypeRef(dst []byte, tname *types.TypeName, mod *Ts
 	return dst
 }
 
-func (t *transpiler) transpileTypeArgs(dst []byte, targs *types.TypeList, mod *TsModule) []byte {
+func (t *transpiler) transpileTypeArgs(dst []byte, targs *types.TypeList, mod *Module) []byte {
 	if targs.Len() == 0 {
 		return dst
 	}
@@ -69,7 +69,7 @@ func (t *transpiler) transpileTypeArgs(dst []byte, targs *types.TypeList, mod *T
 	return dst
 }
 
-func (t *transpiler) transpileTypeParams(dst []byte, tparams *types.TypeParamList, mod *TsModule) []byte {
+func (t *transpiler) transpileTypeParams(dst []byte, tparams *types.TypeParamList, mod *Module) []byte {
 	if tparams.Len() == 0 {
 		return dst
 	}

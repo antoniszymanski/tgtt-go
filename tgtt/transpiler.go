@@ -18,7 +18,7 @@ type transpiler struct {
 	primaryPkg        *packages.Package
 	secondaryPkgs     []*packages.Package
 	packages          map[string]*packages.Package // Keyed by package path
-	modules           TsPackage
+	modules           Package
 	typeMappings      map[string]string
 	includeUnexported bool
 }
@@ -85,16 +85,16 @@ func (t *transpiler) init2() {
 
 func (t *transpiler) init3() {
 	mainPkgs := t.mainPkgs()
-	t.modules = make(TsPackage, len(mainPkgs))
+	t.modules = make(Package, len(mainPkgs))
 	for _, pkg := range mainPkgs {
 		t.addModule(pkg.Name, pkg.PkgPath)
 	}
 }
 
-func (t *transpiler) addModule(name, goPath string) *TsModule {
-	mod := &TsModule{
+func (t *transpiler) addModule(name, goPath string) *Module {
+	mod := &Module{
 		GoPath:  goPath,
-		Imports: orderedmap.NewOrderedMap[string, *TsModule](),
+		Imports: orderedmap.NewOrderedMap[string, *Module](),
 		Defs:    orderedmap.NewOrderedMap[string, string](),
 	}
 	t.modules[name] = mod
