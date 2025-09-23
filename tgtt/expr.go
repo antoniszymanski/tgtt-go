@@ -134,7 +134,7 @@ func transpileStructType(dst []byte, expr *ast.StructType) (_ []byte, err error)
 	if len(s.Fields) > 0 {
 		dst = append(dst, ' ')
 	}
-	for _, field := range s.Fields {
+	for i, field := range s.Fields {
 		dst = strconv.AppendQuote(dst, field.Name)
 		if field.Optional {
 			dst = append(dst, '?')
@@ -144,7 +144,10 @@ func transpileStructType(dst []byte, expr *ast.StructType) (_ []byte, err error)
 		if err != nil {
 			return nil, err
 		}
-		dst = append(dst, "; "...)
+		if i < len(s.Fields)-1 {
+			dst = append(dst, ';')
+		}
+		dst = append(dst, ' ')
 	}
 	dst = append(dst, '}')
 	for _, embedded := range s.Embedded {

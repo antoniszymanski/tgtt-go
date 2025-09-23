@@ -301,14 +301,17 @@ func (t *transpiler) transpileStruct(dst []byte, typ *types.Struct, mod *TsModul
 	if len(s.Fields) > 0 {
 		dst = append(dst, ' ')
 	}
-	for _, field := range s.Fields {
+	for i, field := range s.Fields {
 		dst = strconv.AppendQuote(dst, field.Name)
 		if field.Optional {
 			dst = append(dst, '?')
 		}
 		dst = append(dst, ": "...)
 		dst = t.transpileType(dst, field.Type, mod)
-		dst = append(dst, "; "...)
+		if i < len(s.Fields)-1 {
+			dst = append(dst, ';')
+		}
+		dst = append(dst, ' ')
 	}
 	dst = append(dst, '}')
 	for _, embedded := range s.Embedded {
