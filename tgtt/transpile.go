@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/antoniszymanski/loadpackage-go"
-	"github.com/fatih/structtag"
 	"github.com/hashicorp/go-set/v3"
 	"github.com/lindell/go-ordered-set/orderedset"
 	"golang.org/x/tools/go/packages"
@@ -318,11 +317,11 @@ func (t *transpiler) transpileStruct(typ *types.Struct, mod *TsModule) string {
 		)
 	}
 	sb.WriteByte('}')
-	for _, embed := range s.Embeds {
+	for _, field := range s.Embedded {
 		sb.WriteString(" & ")
-		typStr := t.transpileType(embed.Type, mod)
+		typStr := t.transpileType(field, mod)
 		typStr, found := strings.CutSuffix(typStr, " | null")
-		if !embed.Optional && !found {
+		if !found {
 			sb.WriteString(typStr)
 		} else {
 			sb.WriteString("Partial<" + typStr + ">")
@@ -331,50 +330,24 @@ func (t *transpiler) transpileStruct(typ *types.Struct, mod *TsModule) string {
 	return sb.String()
 }
 
-type structData struct {
-	Embeds, Fields []fieldData
-}
-
-type fieldData struct {
-	Name     string
-	Optional bool
-	Type     types.Type
-}
-
-func parseStruct(typ *types.Struct) structData {
-	var s structData
+func parseStruct(typ *types.Struct) structInfo[types.Type] {
+	var s structInfo[types.Type]
 	for i := range typ.NumFields() {
 		field := typ.Field(i)
 		if !field.Exported() {
 			continue
 		}
-		var f fieldData
-		embedded := field.Embedded()
-		func() {
-			tags, err := structtag.Parse(typ.Tag(i))
-			if tags == nil || err != nil {
-				f.Name = field.Name()
-				return
-			}
-			tag, err := tags.Get("json")
-			if err != nil {
-				f.Name = field.Name()
-				return
-			}
-			f.Name = tag.Name
-			f.Optional = tag.HasOption("omitempty") || tag.HasOption("omitzero")
-			if !embedded {
-				embedded = tag.HasOption("inline")
-			}
-		}()
-		if f.Name == "-" {
+		f := fieldInfo[types.Type]{Name: field.Name(), Type: field.Type()}
+		if field.Embedded() {
+			f.Name = ""
+		}
+		if parseFieldTag[types.Type](typ.Tag(i))(&f) {
 			continue
 		}
-		f.Type = field.Type()
-		if !embedded {
-			s.Fields = append(s.Fields, f)
+		if f.Name == "" {
+			s.Embedded = append(s.Embedded, f.Type)
 		} else {
-			s.Embeds = append(s.Embeds, f)
+			s.Fields = append(s.Fields, f)
 		}
 	}
 	return s
