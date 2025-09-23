@@ -3,13 +3,7 @@
 
 package tgtt
 
-import (
-	"bytes"
-	_ "embed"
-	"text/template"
-
-	"github.com/elliotchance/orderedmap/v3"
-)
+import "github.com/elliotchance/orderedmap/v3"
 
 type TsModule struct {
 	GoPath  string
@@ -17,15 +11,22 @@ type TsModule struct {
 	Defs    *orderedmap.OrderedMap[string, string]
 }
 
-//go:embed tsmodule.tmpl
-var tsmoduleTmplSource string
-
-var tsmoduleTmpl = template.Must(template.New("tsmodule").Parse(tsmoduleTmplSource))
-
-func (m *TsModule) Render() ([]byte, error) {
-	var buf bytes.Buffer
-	if err := tsmoduleTmpl.Execute(&buf, m); err != nil {
-		return nil, err
+func (m *TsModule) Render() []byte {
+	var b []byte
+	b = append(b, "/* "...)
+	b = append(b, m.GoPath...)
+	b = append(b, " */"...)
+	for path := range m.Imports.Keys() {
+		b = append(b, '\n')
+		b = append(b, "import * as "...)
+		b = append(b, path...)
+		b = append(b, ` from "./`...)
+		b = append(b, path...)
+		b = append(b, `";`...)
 	}
-	return buf.Bytes(), nil
+	for def := range m.Defs.Values() {
+		b = append(b, "\n\n"...)
+		b = append(b, def...)
+	}
+	return b
 }

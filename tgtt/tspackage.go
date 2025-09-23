@@ -23,11 +23,7 @@ func (p TsPackage) Render(opts PackageRenderOptions) error {
 	}
 	for modName, mod := range p {
 		g.Go(func() error {
-			data, err := mod.Render()
-			if err != nil {
-				return err
-			}
-			return opts.Write(modName, data)
+			return opts.Write(modName, mod.Render())
 		})
 	}
 	return g.Wait()
