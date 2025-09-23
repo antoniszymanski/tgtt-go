@@ -3,21 +3,17 @@
 
 package tgtt
 
-import (
-	"fmt"
-	"go/types"
-	"strings"
-)
+import "go/types"
 
-func (t *transpiler) transpileTypeRef(tname *types.TypeName, mod *TsModule) string {
+func (t *transpiler) transpileTypeRef(dst []byte, tname *types.TypeName, mod *TsModule) []byte {
 	if tname.Pkg() == nil {
 		switch tname.Name() {
 		case "comparable":
-			return "string | number /* comparable */"
+			return append(dst, "string | number /* comparable */"...)
 		case "error":
-			return "any /* error */"
+			return append(dst, "any /* error */"...)
 		default:
-			return tname.Name()
+			return append(dst, tname.Name()...)
 		}
 	}
 
@@ -47,52 +43,50 @@ func (t *transpiler) transpileTypeRef(tname *types.TypeName, mod *TsModule) stri
 	}
 
 	if typeMod == mod {
-		return tname.Name()
+		dst = append(dst, tname.Name()...)
 	} else {
 		mod.Imports.Set(pkg.Name, typeMod)
-		return pkg.Name + "." + tname.Name()
+		dst = append(dst, pkg.Name...)
+		dst = append(dst, '.')
+		dst = append(dst, tname.Name()...)
 	}
+	return dst
 }
 
-func (t *transpiler) transpileTypeArgs(targs *types.TypeList, mod *TsModule) string {
-	var sb strings.Builder
+func (t *transpiler) transpileTypeArgs(dst []byte, targs *types.TypeList, mod *TsModule) []byte {
 	if targs.Len() > 0 {
-		sb.WriteByte('<')
+		dst = append(dst, '<')
 	}
 	for i := range targs.Len() {
 		targ := targs.At(i)
-		sb.WriteString(t.transpileType(targ, mod))
+		dst = t.transpileType(dst, targ, mod)
 		if i < targs.Len()-1 {
-			sb.WriteString(", ")
+			dst = append(dst, ", "...)
 		}
 	}
 	if targs.Len() > 0 {
-		sb.WriteByte('>')
+		dst = append(dst, '>')
 	}
-	return sb.String()
+	return dst
 }
 
-func (t *transpiler) transpileTypeParams(tparams *types.TypeParamList, mod *TsModule) string {
-	var sb strings.Builder
+func (t *transpiler) transpileTypeParams(dst []byte, tparams *types.TypeParamList, mod *TsModule) []byte {
 	if tparams.Len() > 0 {
-		sb.WriteByte('<')
+		dst = append(dst, '<')
 	}
 	for i := range tparams.Len() {
 		tparam := tparams.At(i)
-		fmt.Fprintf(
-			&sb,
-			`%s extends %s`,
-			tparam.Obj().Name(),
-			t.transpileType(tparam.Constraint(), mod),
-		)
+		dst = append(dst, tparam.Obj().Name()...)
+		dst = append(dst, " extends "...)
+		dst = t.transpileType(dst, tparam.Constraint(), mod)
 		if i < tparams.Len()-1 {
-			sb.WriteString(", ")
+			dst = append(dst, ", "...)
 		}
 	}
 	if tparams.Len() > 0 {
-		sb.WriteByte('>')
+		dst = append(dst, '>')
 	}
-	return sb.String()
+	return dst
 }
 
 func (t *transpiler) getPkgPath(obj types.Object) string {

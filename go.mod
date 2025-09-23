@@ -11,7 +11,6 @@ require (
 	github.com/fatih/structtag v1.2.0
 	github.com/hashicorp/go-set/v3 v3.0.1
 	github.com/invopop/jsonschema v0.13.0
-	github.com/lindell/go-ordered-set v1.0.2
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	golang.org/x/tools v0.37.0
 )

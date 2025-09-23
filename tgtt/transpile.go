@@ -4,8 +4,8 @@
 package tgtt
 
 import (
+	"bytes"
 	"cmp"
-	"fmt"
 	"go/constant"
 	"go/types"
 	"math/big"
@@ -15,7 +15,6 @@ import (
 
 	"github.com/antoniszymanski/loadpackage-go"
 	"github.com/hashicorp/go-set/v3"
-	"github.com/lindell/go-ordered-set/orderedset"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -59,7 +58,6 @@ func Transpile(opts TranspileOptions) (TsPackage, error) {
 	for i, pkg := range t.secondaryPkgs {
 		transpilePkg(pkg, opts.SecondaryPackages[i])
 	}
-
 	return t.modules, nil
 }
 
@@ -122,7 +120,6 @@ func (t *transpiler) transpileObject(obj types.Object, mod *TsModule) {
 	if mod.Defs.Has(obj.Name()) {
 		return
 	}
-
 	// https://github.com/golang/example/tree/master/gotypes#objects
 	switch obj := obj.(type) {
 	case *types.Const:
@@ -134,55 +131,54 @@ func (t *transpiler) transpileObject(obj types.Object, mod *TsModule) {
 
 func (t *transpiler) transpileConst(obj *types.Const, mod *TsModule) {
 	mod.Defs.Set(obj.Name(), "") // prevent infinite recursion
-	var def string
+	def := append([]byte(nil), "export const "...)
+	def = append(def, obj.Name()...)
+	var ok bool
 	switch typ := obj.Type().(type) {
 	case *types.Named:
-		typStr := t.transpileTypeRef(typ.Obj(), mod)
-		val, ok := transpileConstVal(obj.Val(), false)
-		if !ok {
-			mod.Defs.Delete(obj.Name())
-			return
-		}
-		def = fmt.Sprintf(`export const %s: %s = %s`, obj.Name(), typStr, val)
+		def = append(def, ": "...)
+		def = t.transpileTypeRef(def, typ.Obj(), mod)
+		def = append(def, " = "...)
+		def, ok = transpileConstVal(def, obj.Val(), false)
 	default:
-		val, ok := transpileConstVal(obj.Val(), true)
-		if !ok {
-			mod.Defs.Delete(obj.Name())
-			return
-		}
-		def = fmt.Sprintf(`export const %s = %s`, obj.Name(), val)
+		def = append(def, " = "...)
+		def, ok = transpileConstVal(def, obj.Val(), true)
 	}
-	mod.Defs.Set(obj.Name(), def)
+	if !ok {
+		mod.Defs.Delete(obj.Name())
+		return
+	}
+	mod.Defs.Set(obj.Name(), bytesToString(def))
 }
 
-func transpileConstVal(x constant.Value, allowBigint bool) (string, bool) {
+func transpileConstVal(dst []byte, x constant.Value, allowBigint bool) ([]byte, bool) {
 	const maxSafeInt = 1<<53 - 1
 	const minSafeInt = -(1<<53 - 1)
 	switch x := constant.Val(x).(type) {
 	case bool:
-		return strconv.FormatBool(x), true
+		return strconv.AppendBool(dst, x), true
 	case string:
-		return strconv.Quote(x), true
+		return strconv.AppendQuote(dst, x), true
 	case int64:
-		s := strconv.FormatInt(x, 10)
+		dst = strconv.AppendInt(dst, x, 10)
 		if allowBigint && (x < minSafeInt || x > maxSafeInt) {
-			s += "n" // BigInt
+			dst = append(dst, 'n') // BigInt
 		}
-		return s, true
+		return dst, true
 	case *big.Int:
-		s := x.String()
+		dst = x.Append(dst, 10)
 		if allowBigint && (x.Cmp(big.NewInt(minSafeInt)) == -1 || x.Cmp(big.NewInt(maxSafeInt)) == 1) {
-			s += "n" // BigInt
+			dst = append(dst, 'n') // BigInt
 		}
-		return s, true
+		return dst, true
 	case *big.Rat:
 		f, _ := x.Float64()
-		return strconv.FormatFloat(f, 'g', -1, 64), true
+		return strconv.AppendFloat(dst, f, 'g', -1, 64), true
 	case *big.Float:
 		f, _ := x.Float64()
-		return strconv.FormatFloat(f, 'g', -1, 64), true
+		return strconv.AppendFloat(dst, f, 'g', -1, 64), true
 	default:
-		return "", false
+		return nil, false
 	}
 }
 
@@ -191,143 +187,142 @@ func (t *transpiler) transpileTypeDef(obj *types.TypeName, mod *TsModule) {
 	if !ok {
 		return
 	}
-
 	mod.Defs.Set(obj.Name(), "") // prevent infinite recursion
-	var def string
-	{
-		path := t.getPkgPath(typ.Obj())
-		typStr, ok := t.typeMappings[path]
-		if !ok {
-			typStr = t.transpileType(typ.Underlying(), mod)
-		}
-		def = fmt.Sprintf(
-			`export type %s%s = %s`,
-			typ.Obj().Name(),
-			t.transpileTypeParams(typ.TypeParams(), mod),
-			typStr,
-		)
+	def := append([]byte(nil), "export type "...)
+	def = append(def, typ.Obj().Name()...)
+	def = t.transpileTypeParams(def, typ.TypeParams(), mod)
+	def = append(def, " = "...)
+	path := t.getPkgPath(typ.Obj())
+	if typStr, ok := t.typeMappings[path]; ok {
+		def = append(def, typStr...)
+	} else {
+		def = t.transpileType(def, typ.Underlying(), mod)
 	}
-	mod.Defs.Set(obj.Name(), def)
+	mod.Defs.Set(obj.Name(), bytesToString(def))
 }
 
-func (t *transpiler) transpileType(typ types.Type, mod *TsModule) string {
+func (t *transpiler) transpileType(dst []byte, typ types.Type, mod *TsModule) []byte {
 	// https://github.com/golang/example/tree/master/gotypes#types
 	switch typ := typ.(type) {
 	case *types.Basic:
-		return t.transpileBasic(typ, mod)
+		return t.transpileBasic(dst, typ, mod)
 	case *types.Pointer:
-		return t.transpilePointer(typ, mod)
+		return t.transpilePointer(dst, typ, mod)
 	case *types.Array:
-		return t.transpileArray(typ, mod)
+		return t.transpileArray(dst, typ, mod)
 	case *types.Slice:
-		return t.transpileSlice(typ, mod)
+		return t.transpileSlice(dst, typ, mod)
 	case *types.Map:
-		return t.transpileMap(typ, mod)
+		return t.transpileMap(dst, typ, mod)
 	case *types.Struct:
-		return t.transpileStruct(typ, mod)
+		return t.transpileStruct(dst, typ, mod)
 	case *types.Alias:
-		return t.transpileAlias(typ, mod)
+		return t.transpileAlias(dst, typ, mod)
 	case *types.Named:
-		return t.transpileNamed(typ, mod)
+		return t.transpileNamed(dst, typ, mod)
 	case *types.Interface:
-		return t.transpileInterface(typ, mod)
+		return t.transpileInterface(dst, typ, mod)
 	case *types.Union:
-		return t.transpileUnion(typ, mod)
+		return t.transpileUnion(dst, typ, mod)
 	case *types.TypeParam:
-		return t.transpileTypeParam(typ, mod)
+		return t.transpileTypeParam(dst, typ, mod)
 	default:
-		return "any"
+		return append(dst, "any"...)
 	}
 }
 
-func (t *transpiler) transpileBasic(typ *types.Basic, _ *TsModule) string {
+func (t *transpiler) transpileBasic(dst []byte, typ *types.Basic, _ *TsModule) (ret []byte) {
 	switch typ.Kind() {
 	case types.Bool:
-		return "boolean"
+		return append(dst, "boolean"...)
 	case types.Int:
-		return "number /* int */"
+		return append(dst, "number /* int */"...)
 	case types.Int8:
-		return "number /* int8 */"
+		return append(dst, "number /* int8 */"...)
 	case types.Int16:
-		return "number /* int16 */"
+		return append(dst, "number /* int16 */"...)
 	case types.Int32:
-		return "number /* int32 */"
+		return append(dst, "number /* int32 */"...)
 	case types.Int64:
-		return "number /* int64 */"
+		return append(dst, "number /* int64 */"...)
 	case types.Uint:
-		return "number /* uint */"
+		return append(dst, "number /* uint */"...)
 	case types.Uint8:
-		return "number /* uint8 */"
+		return append(dst, "number /* uint8 */"...)
 	case types.Uint16:
-		return "number /* uint16 */"
+		return append(dst, "number /* uint16 */"...)
 	case types.Uint32:
-		return "number /* uint32 */"
+		return append(dst, "number /* uint32 */"...)
 	case types.Uint64:
-		return "number /* uint64 */"
+		return append(dst, "number /* uint64 */"...)
 	case types.Uintptr:
-		return "number /* uintptr */"
+		return append(dst, "number /* uintptr */"...)
 	case types.Float32:
-		return "number /* float32 */"
+		return append(dst, "number /* float32 */"...)
 	case types.Float64:
-		return "number /* float64 */"
+		return append(dst, "number /* float64 */"...)
 	case types.String:
-		return "string"
+		return append(dst, "string"...)
 	default:
-		return "any"
+		return append(dst, "any"...)
 	}
 }
 
-func (t *transpiler) transpilePointer(typ *types.Pointer, mod *TsModule) string {
-	typStr := t.transpileType(typ.Elem(), mod)
-	if !strings.HasSuffix(typStr, " | null") {
-		typStr += " | null"
+func (t *transpiler) transpilePointer(dst []byte, typ *types.Pointer, mod *TsModule) []byte {
+	dst = t.transpileType(dst, typ.Elem(), mod)
+	if !bytes.HasSuffix(dst, []byte(" | null")) {
+		dst = append(dst, " | null"...)
 	}
-	return typStr
+	return dst
 }
 
-func (t *transpiler) transpileArray(typ *types.Array, mod *TsModule) string {
-	return fmt.Sprintf(`%s[]`, t.transpileType(typ.Elem(), mod))
+func (t *transpiler) transpileArray(dst []byte, typ *types.Array, mod *TsModule) []byte {
+	dst = t.transpileType(dst, typ.Elem(), mod)
+	dst = append(dst, "[]"...)
+	return dst
 }
 
-func (t *transpiler) transpileSlice(typ *types.Slice, mod *TsModule) string {
-	return fmt.Sprintf(`%s[]`, t.transpileType(typ.Elem(), mod))
+func (t *transpiler) transpileSlice(dst []byte, typ *types.Slice, mod *TsModule) []byte {
+	dst = t.transpileType(dst, typ.Elem(), mod)
+	dst = append(dst, "[]"...)
+	return dst
 }
 
-func (t *transpiler) transpileMap(typ *types.Map, mod *TsModule) string {
-	return fmt.Sprintf(`{ [key in string]: %s }`, t.transpileType(typ.Elem(), mod))
+func (t *transpiler) transpileMap(dst []byte, typ *types.Map, mod *TsModule) []byte {
+	dst = append(dst, "{ [key in string]: "...)
+	dst = t.transpileType(dst, typ.Elem(), mod)
+	dst = append(dst, " }"...)
+	return dst
 }
 
-func (t *transpiler) transpileStruct(typ *types.Struct, mod *TsModule) string {
+func (t *transpiler) transpileStruct(dst []byte, typ *types.Struct, mod *TsModule) []byte {
 	s := parseStruct(typ)
-	var sb strings.Builder
-	sb.WriteByte('{')
+	dst = append(dst, '{')
 	if len(s.Fields) > 0 {
-		sb.WriteByte(' ')
+		dst = append(dst, ' ')
 	}
 	for _, field := range s.Fields {
-		format := `%s: %s; `
+		dst = strconv.AppendQuote(dst, field.Name)
 		if field.Optional {
-			format = `%s?: %s; `
+			dst = append(dst, '?')
 		}
-		fmt.Fprintf(
-			&sb,
-			format,
-			strconv.Quote(field.Name),
-			t.transpileType(field.Type, mod),
-		)
+		dst = append(dst, ": "...)
+		dst = t.transpileType(dst, field.Type, mod)
+		dst = append(dst, "; "...)
 	}
-	sb.WriteByte('}')
-	for _, field := range s.Embedded {
-		sb.WriteString(" & ")
-		typStr := t.transpileType(field, mod)
-		typStr, found := strings.CutSuffix(typStr, " | null")
-		if !found {
-			sb.WriteString(typStr)
-		} else {
-			sb.WriteString("Partial<" + typStr + ">")
+	dst = append(dst, '}')
+	for _, embedded := range s.Embedded {
+		dst = append(dst, " & "...)
+		i := len(dst)
+		dst = t.transpileType(dst, embedded, mod)
+		var found bool
+		dst, found = bytes.CutSuffix(dst, []byte(" | null"))
+		if found {
+			dst = slices.Insert(dst, i, []byte("Partial<")...)
+			dst = append(dst, '>')
 		}
 	}
-	return sb.String()
+	return dst
 }
 
 func parseStruct(typ *types.Struct) structInfo[types.Type] {
@@ -353,15 +348,19 @@ func parseStruct(typ *types.Struct) structInfo[types.Type] {
 	return s
 }
 
-func (t *transpiler) transpileAlias(typ *types.Alias, mod *TsModule) string {
-	return t.transpileTypeRef(typ.Obj(), mod) + t.transpileTypeArgs(typ.TypeArgs(), mod)
+func (t *transpiler) transpileAlias(dst []byte, typ *types.Alias, mod *TsModule) []byte {
+	dst = t.transpileTypeRef(dst, typ.Obj(), mod)
+	dst = t.transpileTypeArgs(dst, typ.TypeArgs(), mod)
+	return dst
 }
 
-func (t *transpiler) transpileNamed(typ *types.Named, mod *TsModule) string {
-	return t.transpileTypeRef(typ.Obj(), mod) + t.transpileTypeArgs(typ.TypeArgs(), mod)
+func (t *transpiler) transpileNamed(dst []byte, typ *types.Named, mod *TsModule) []byte {
+	dst = t.transpileTypeRef(dst, typ.Obj(), mod)
+	dst = t.transpileTypeArgs(dst, typ.TypeArgs(), mod)
+	return dst
 }
 
-func (t *transpiler) transpileInterface(typ *types.Interface, mod *TsModule) string {
+func (t *transpiler) transpileInterface(dst []byte, typ *types.Interface, mod *TsModule) []byte {
 	intersect := func(a, b []types.Type) []types.Type {
 		var dest []types.Type
 		for _, x := range a {
@@ -387,32 +386,46 @@ func (t *transpiler) transpileInterface(typ *types.Interface, mod *TsModule) str
 		unions = append(unions, terms)
 	}
 	if len(unions) == 0 {
-		return "any"
+		return append(dst, "any"...)
 	}
 	for _, y := range unions[1:] {
 		unions[0] = intersect(unions[0], y)
 	}
 	if len(unions[0]) == 0 {
-		return "any"
+		return append(dst, "any"...)
 	}
-	terms := orderedset.New[string]()
-	for _, termTyp := range unions[0] {
-		terms.Add(t.transpileType(termTyp, mod))
+	terms := set.NewHashSetFunc(0, bytesToString)
+	for _, typ := range unions[0] {
+		i := len(dst)
+		dst = t.transpileType(dst, typ, mod)
+		if !terms.Insert(dst[i:]) {
+			dst = dst[:i]
+		} else {
+			dst = append(dst, " | "...)
+		}
 	}
-	return strings.Join(terms.Values(), " | ")
+	dst = bytes.TrimSuffix(dst, []byte(" | "))
+	return dst
 }
 
-func (t *transpiler) transpileUnion(typ *types.Union, mod *TsModule) string {
-	terms := orderedset.New[string]()
+func (t *transpiler) transpileUnion(dst []byte, typ *types.Union, mod *TsModule) []byte {
+	if typ.Len() == 0 {
+		return append(dst, "any"...)
+	}
+	terms := set.NewHashSetFunc(0, bytesToString)
 	for term := range typ.Terms() {
-		terms.Add(t.transpileType(term.Type(), mod))
+		i := len(dst)
+		dst = t.transpileType(dst, term.Type(), mod)
+		if !terms.Insert(dst[i:]) {
+			dst = dst[:i]
+		} else {
+			dst = append(dst, " | "...)
+		}
 	}
-	if terms.Size() == 0 {
-		return "any"
-	}
-	return strings.Join(terms.Values(), " | ")
+	dst = bytes.TrimSuffix(dst, []byte(" | "))
+	return dst
 }
 
-func (t *transpiler) transpileTypeParam(typ *types.TypeParam, _ *TsModule) string {
-	return typ.Obj().Name()
+func (t *transpiler) transpileTypeParam(dst []byte, typ *types.TypeParam, _ *TsModule) []byte {
+	return append(dst, typ.Obj().Name()...)
 }
