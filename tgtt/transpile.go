@@ -231,7 +231,7 @@ func (t *transpiler) transpileType(dst []byte, typ types.Type, mod *Module) []by
 	}
 }
 
-func (t *transpiler) transpileBasic(dst []byte, typ *types.Basic, _ *Module) (ret []byte) {
+func (t *transpiler) transpileBasic(dst []byte, typ *types.Basic, _ *Module) []byte {
 	switch typ.Kind() {
 	case types.Bool:
 		return append(dst, "boolean"...)
