@@ -23,7 +23,7 @@ type Config struct {
 	OutputPath        string                              `json:"output_path" jsonschema:"required,minLength=1"`
 	TypeMappings      internal.Object[string, string]     `json:"type_mappings"`
 	PrimaryPackage    tgtt.PackageOptions                 `json:"primary_package" jsonschema:"required"`
-	Include           []string                            `json:"include"`
+	Include           internal.Array[string]              `json:"include"`
 	SecondaryPackages internal.Array[tgtt.PackageOptions] `json:"secondary_packages"`
 }
 

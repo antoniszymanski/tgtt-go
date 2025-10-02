@@ -1,3 +1,3 @@
 {
-  "conventionalCommits.scopes": ["tgtt", "cmd/tgtt"]
+  "conventionalCommits.scopes": ["tgtt", "cmd/tgtt", "cmd/tgtt/config"]
 }
