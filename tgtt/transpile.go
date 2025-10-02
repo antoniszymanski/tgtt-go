@@ -31,12 +31,12 @@ func Transpile(opts TranspileOptions) (Package, error) {
 			packages.NeedTypesInfo,
 	}
 	var err error
-	t.primaryPkg, err = loadpackage.Load(opts.PrimaryPackage.Path, cfg)
+	t.primaryPkg, err = loadpackage.Load("pattern="+opts.PrimaryPackage.Path, cfg)
 	if err != nil {
 		return nil, err
 	}
 	for _, pkgOpts := range opts.SecondaryPackages {
-		pkg, err := loadpackage.Load(pkgOpts.Path, cfg)
+		pkg, err := loadpackage.Load("pattern="+pkgOpts.Path, cfg)
 		if err != nil {
 			return nil, err
 		}
