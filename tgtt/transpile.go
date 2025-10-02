@@ -206,9 +206,9 @@ func (t *transpiler) transpileTypeDef(obj *types.TypeName, mod *Module) {
 	def = append(def, typ.Obj().Name()...)
 	def = t.transpileTypeParams(def, typ.TypeParams(), mod)
 	def = append(def, " = "...)
-	path := qualifiedName(typ.Obj())
-	if typStr, ok := t.typeMappings[path]; ok {
-		def = append(def, typStr...)
+	qualifiedName := t.qualifiedName(typ.Obj())
+	if x, ok := t.typeMappings[qualifiedName]; ok {
+		def = append(def, x...)
 	} else {
 		def = t.transpileType(def, typ.Underlying(), mod)
 	}
@@ -246,7 +246,7 @@ func (t *transpiler) transpileType(dst []byte, typ types.Type, mod *Module) []by
 }
 
 func (t *transpiler) transpileBasic(dst []byte, typ *types.Basic, _ *Module) []byte {
-	if x, ok := t.typeMappings[typ.Name()]; ok {
+	if x, ok := t.typeMappings["_."+typ.Name()]; ok {
 		return append(dst, x...)
 	}
 	switch typ.Kind() {

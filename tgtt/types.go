@@ -87,10 +87,13 @@ func (t *transpiler) transpileTypeParams(dst []byte, tparams *types.TypeParamLis
 	return dst
 }
 
-func qualifiedName(obj types.Object) string {
-	if pkg := obj.Pkg(); pkg == nil {
+func (t *transpiler) qualifiedName(obj types.Object) string {
+	switch pkg := obj.Pkg(); {
+	case pkg == nil:
+		return "_." + obj.Name()
+	case pkg.Path() == t.primaryPkg.PkgPath:
 		return obj.Name()
-	} else {
+	default:
 		return pkg.Path() + "." + obj.Name()
 	}
 }
