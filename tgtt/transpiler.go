@@ -46,13 +46,17 @@ func (t *transpiler) init1() {
 func (t *transpiler) init2() {
 	pkgs := make([]*packages.Package, 0, len(t.packages)-1)
 	for _, pkg := range t.packages {
-		if pkg != t.primaryPkg {
+		if t.primaryPkg.PkgPath != pkg.PkgPath {
 			pkgs = append(pkgs, pkg)
 		}
 	}
 	slices.SortFunc(pkgs, func(a, b *packages.Package) int {
-		is_a_secondary := slices.Contains(t.secondaryPkgs, a)
-		is_b_secondary := slices.Contains(t.secondaryPkgs, b)
+		is_a_secondary := slices.ContainsFunc(t.secondaryPkgs, func(elem *packages.Package) bool {
+			return a.PkgPath == elem.PkgPath
+		})
+		is_b_secondary := slices.ContainsFunc(t.secondaryPkgs, func(elem *packages.Package) bool {
+			return b.PkgPath == elem.PkgPath
+		})
 		if is_a_secondary && !is_b_secondary {
 			return -1
 		} else if !is_a_secondary && is_b_secondary {
