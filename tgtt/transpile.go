@@ -192,7 +192,7 @@ func (t *transpiler) transpileTypeDef(obj *types.TypeName, mod *Module) {
 	def = append(def, typ.Obj().Name()...)
 	def = t.transpileTypeParams(def, typ.TypeParams(), mod)
 	def = append(def, " = "...)
-	path := t.getPkgPath(typ.Obj())
+	path := qualifiedName(typ.Obj())
 	if typStr, ok := t.typeMappings[path]; ok {
 		def = append(def, typStr...)
 	} else {

@@ -33,7 +33,7 @@ func (t *transpiler) transpileTypeRef(dst []byte, tname *types.TypeName, mod *Mo
 			if !ok {
 				return false
 			}
-			return t.getPkgPath(tname) == t.getPkgPath(typ.Obj())
+			return areObjectsEqual(tname, typ.Obj())
 		}()
 		if obj.Name() == tname.Name() {
 			t.transpileObject(obj, typeMod)
@@ -87,11 +87,24 @@ func (t *transpiler) transpileTypeParams(dst []byte, tparams *types.TypeParamLis
 	return dst
 }
 
-func (t *transpiler) getPkgPath(obj types.Object) string {
-	pkg := obj.Pkg()
-	if pkg == nil || pkg.Path() == t.primaryPkg.PkgPath {
+func qualifiedName(obj types.Object) string {
+	if pkg := obj.Pkg(); pkg == nil {
 		return obj.Name()
 	} else {
 		return pkg.Path() + "." + obj.Name()
 	}
+}
+
+func areObjectsEqual(objA, objB types.Object) bool {
+	var pkgPathA, pkgPathB string
+	if pkg := objA.Pkg(); pkg != nil {
+		pkgPathA = pkg.Path()
+	}
+	if pkg := objB.Pkg(); pkg != nil {
+		pkgPathB = pkg.Path()
+	}
+	if pkgPathA != pkgPathB {
+		return false
+	}
+	return objA.Name() == objB.Name()
 }
