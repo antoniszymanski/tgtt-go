@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/antoniszymanski/collections-go/set"
 	"github.com/elliotchance/orderedmap/v3"
-	"github.com/hashicorp/go-set/v3"
 	"golang.org/x/tools/go/packages"
 )
 

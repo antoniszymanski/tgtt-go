@@ -5,11 +5,11 @@ go 1.24.6
 require (
 	github.com/DisposaBoy/JsonConfigReader v0.0.0-20201129172854-99cf318d67e7
 	github.com/alecthomas/kong v1.12.1
+	github.com/antoniszymanski/collections-go v0.1.0
 	github.com/antoniszymanski/loadpackage-go v0.1.1
 	github.com/antoniszymanski/sanefmt-go v0.2.3
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/fatih/structtag v1.2.0
-	github.com/hashicorp/go-set/v3 v3.0.1
 	github.com/invopop/jsonschema v0.13.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	golang.org/x/sync v0.17.0

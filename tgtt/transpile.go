@@ -8,13 +8,14 @@ import (
 	"cmp"
 	"go/constant"
 	"go/types"
+	"hash/maphash"
 	"math/big"
 	"slices"
 	"strconv"
 	"strings"
 
+	"github.com/antoniszymanski/collections-go/set"
 	"github.com/antoniszymanski/loadpackage-go"
-	"github.com/hashicorp/go-set/v3"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -45,11 +46,10 @@ func Transpile(opts TranspileOptions) (Package, error) {
 	t.init()
 
 	transpilePkg := func(pkg *packages.Package, opts PackageOptions) {
-		isNamesEmpty := opts.Names == nil || opts.Names.Empty()
 		for _, obj := range sortedDefs(pkg) {
-			if !isNamesEmpty && opts.Names.Contains(obj.Name()) {
+			if !opts.Names.Empty() && opts.Names.Contains(obj.Name()) {
 				t.transpileObject(obj, t.modules[pkg.Name])
-			} else if isNamesEmpty && (obj.Exported() || t.includeUnexported) {
+			} else if opts.Names.Empty() && (obj.Exported() || t.includeUnexported) {
 				t.transpileObject(obj, t.modules[pkg.Name])
 			}
 		}
@@ -69,8 +69,8 @@ type TranspileOptions struct {
 }
 
 type PackageOptions struct {
-	Path  string           `json:"path" jsonschema:"required,minLength=1"`
-	Names *set.Set[string] `json:"names"`
+	Path  string          `json:"path" jsonschema:"required,minLength=1"`
+	Names set.Set[string] `json:"names"`
 }
 
 func sortedDefs(pkg *packages.Package) []types.Object {
@@ -400,11 +400,20 @@ func (t *transpiler) transpileInterface(dst []byte, typ *types.Interface, mod *M
 	if len(unions[0]) == 0 {
 		return append(dst, "any"...)
 	}
-	terms := set.NewHashSetFunc(0, bytesToString)
+	s := set.New[uint64](0)
+	seed := maphash.MakeSeed()
+	insert := func(b []byte) (modified bool) {
+		hash := maphash.Bytes(seed, b)
+		if s.Contains(hash) {
+			return false
+		}
+		s.Insert(hash)
+		return true
+	}
 	for _, typ := range unions[0] {
 		i := len(dst)
 		dst = t.transpileType(dst, typ, mod)
-		if !terms.Insert(dst[i:]) {
+		if !insert(dst[i:]) {
 			dst = dst[:i]
 		} else {
 			dst = append(dst, " | "...)
@@ -418,11 +427,20 @@ func (t *transpiler) transpileUnion(dst []byte, typ *types.Union, mod *Module) [
 	if typ.Len() == 0 {
 		return append(dst, "any"...)
 	}
-	terms := set.NewHashSetFunc(0, bytesToString)
+	s := set.New[uint64](0)
+	seed := maphash.MakeSeed()
+	insert := func(b []byte) (modified bool) {
+		hash := maphash.Bytes(seed, b)
+		if s.Contains(hash) {
+			return false
+		}
+		s.Insert(hash)
+		return true
+	}
 	for term := range typ.Terms() {
 		i := len(dst)
 		dst = t.transpileType(dst, term.Type(), mod)
-		if !terms.Insert(dst[i:]) {
+		if !insert(dst[i:]) {
 			dst = dst[:i]
 		} else {
 			dst = append(dst, " | "...)

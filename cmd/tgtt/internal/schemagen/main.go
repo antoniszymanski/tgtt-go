@@ -8,9 +8,9 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/antoniszymanski/collections-go/set"
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/config"
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
-	"github.com/hashicorp/go-set/v3"
 	"github.com/invopop/jsonschema"
 )
 

@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/config"
-	"github.com/hashicorp/go-set/v3"
 )
 
 type cmdInit struct {
@@ -46,8 +45,6 @@ func (c *cmdInit) Run() error {
 	if !c.NoSchema {
 		cfg.Schema = c.SchemaPath
 	}
-	cfg.PrimaryPackage.Names = set.New[string](0)
-
 	enc := json.NewEncoder(f)
 	enc.SetEscapeHTML(false)
 	enc.SetIndent("", "  ")
