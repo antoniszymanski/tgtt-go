@@ -31,6 +31,6 @@ func (c *cmdSchema) Run() error {
 		f = os.Stdout
 	}
 
-	_, err = f.Write(config.Schema())
+	_, err = f.WriteString(config.Schema())
 	return err
 }

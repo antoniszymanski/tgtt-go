@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"strings"
 	"sync"
-	"unsafe"
 
 	"github.com/antoniszymanski/tgtt-go/cmd/tgtt/internal"
 	"github.com/antoniszymanski/tgtt-go/tgtt"
@@ -56,11 +55,11 @@ var compiledSchema = sync.OnceValues(func() (*jsonschema.Schema, error) {
 	return compiler.Compile("memory:")
 })
 
-//go:generate go run ../internal/schemagen
-
-func Schema() []byte {
-	return unsafe.Slice(unsafe.StringData(schema), len(schema))
+func Schema() string {
+	return schema
 }
+
+//go:generate go run ../internal/schemagen
 
 //go:embed schema.json
 var schema string
