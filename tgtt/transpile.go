@@ -23,6 +23,7 @@ func Transpile(opts TranspileOptions) (Package, error) {
 	t := &transpiler{
 		typeMappings:      opts.TypeMappings,
 		includeUnexported: opts.IncludeUnexported,
+		fallbackType:      opts.FallbackType,
 	}
 	cfg := &packages.Config{
 		Mode: packages.NeedName |
@@ -66,6 +67,7 @@ type TranspileOptions struct {
 	SecondaryPackages []PackageOptions
 	TypeMappings      map[string]string
 	IncludeUnexported bool
+	FallbackType      string
 }
 
 type PackageOptions struct {
@@ -227,7 +229,7 @@ func (t *transpiler) transpileType(dst []byte, typ types.Type, mod *Module) []by
 	case *types.TypeParam:
 		return t.transpileTypeParam(dst, typ, mod)
 	default:
-		return append(dst, "any"...)
+		return append(dst, t.fallbackType...)
 	}
 }
 
@@ -267,7 +269,7 @@ func (t *transpiler) transpileBasic(dst []byte, typ *types.Basic, _ *Module) []b
 	case types.String:
 		return append(dst, "string"...)
 	default:
-		return append(dst, "any"...)
+		return append(dst, t.fallbackType...)
 	}
 }
 
@@ -392,13 +394,13 @@ func (t *transpiler) transpileInterface(dst []byte, typ *types.Interface, mod *M
 		unions = append(unions, terms)
 	}
 	if len(unions) == 0 {
-		return append(dst, "any"...)
+		return append(dst, t.fallbackType...)
 	}
 	for _, y := range unions[1:] {
 		unions[0] = intersect(unions[0], y)
 	}
 	if len(unions[0]) == 0 {
-		return append(dst, "any"...)
+		return append(dst, t.fallbackType...)
 	}
 	s := set.New[uint64](0)
 	seed := maphash.MakeSeed()
@@ -425,7 +427,7 @@ func (t *transpiler) transpileInterface(dst []byte, typ *types.Interface, mod *M
 
 func (t *transpiler) transpileUnion(dst []byte, typ *types.Union, mod *Module) []byte {
 	if typ.Len() == 0 {
-		return append(dst, "any"...)
+		return append(dst, t.fallbackType...)
 	}
 	s := set.New[uint64](0)
 	seed := maphash.MakeSeed()

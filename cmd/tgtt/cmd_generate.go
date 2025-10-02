@@ -46,6 +46,7 @@ func (c *cmdGenerate) Run() error {
 		SecondaryPackages: cfg.SecondaryPackages,
 		TypeMappings:      cfg.TypeMappings,
 		IncludeUnexported: cfg.IncludeUnexported,
+		FallbackType:      cfg.FallbackType,
 	})
 	if err != nil {
 		return err

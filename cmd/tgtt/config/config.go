@@ -20,6 +20,7 @@ type Config struct {
 	Schema            string                              `json:"$schema,omitzero"`
 	Format            bool                                `json:"format"`
 	IncludeUnexported bool                                `json:"include_unexported"`
+	FallbackType      string                              `json:"fallback_type" jsonschema:"default=any"`
 	OutputPath        string                              `json:"output_path" jsonschema:"required,minLength=1"`
 	TypeMappings      internal.Object[string, string]     `json:"type_mappings"`
 	PrimaryPackage    tgtt.PackageOptions                 `json:"primary_package" jsonschema:"required"`

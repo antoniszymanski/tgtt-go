@@ -21,6 +21,7 @@ type transpiler struct {
 	modules           Package
 	typeMappings      map[string]string
 	includeUnexported bool
+	fallbackType      string
 }
 
 func (t *transpiler) mainPkgs() []*packages.Package {
@@ -105,8 +106,15 @@ func (t *transpiler) addModule(name, goPath string) *Module {
 	return mod
 }
 
+func (t *transpiler) init4() {
+	if strings.TrimSpace(t.fallbackType) == "" {
+		t.fallbackType = "any"
+	}
+}
+
 func (t *transpiler) init() {
 	t.init1()
 	t.init2()
 	t.init3()
+	t.init4()
 }

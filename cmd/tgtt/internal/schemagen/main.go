@@ -20,9 +20,8 @@ func run() error {
 		RequiredFromJSONSchemaTags: true,
 		DoNotReference:             true,
 	}
-	setType := reflect.TypeFor[set.Set[string]]()
 	r.Mapper = func(t reflect.Type) *jsonschema.Schema {
-		if t == setType {
+		if t == reflect.TypeFor[set.Set[string]]() {
 			schema := r.ReflectFromType(reflect.TypeFor[[]string]())
 			schema.Version = ""
 			return schema
@@ -34,7 +33,6 @@ func run() error {
 		return err
 	}
 	schema := r.ReflectFromType(typ)
-
 	data, err := internal.MarshalJSON(schema)
 	if err != nil {
 		return err
