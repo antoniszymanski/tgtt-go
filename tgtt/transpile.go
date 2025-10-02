@@ -46,18 +46,18 @@ func Transpile(opts TranspileOptions) (Package, error) {
 	}
 	t.init()
 
-	transpilePkg := func(pkg *packages.Package, opts PackageOptions) {
+	transpile := func(pkg *packages.Package, names set.Set[string]) {
 		for _, obj := range sortedDefs(pkg) {
-			if !opts.Names.Empty() && opts.Names.Contains(obj.Name()) {
+			if !names.Empty() && names.Contains(obj.Name()) {
 				t.transpileObject(obj, t.modules[pkg.Name])
-			} else if opts.Names.Empty() && (obj.Exported() || t.includeUnexported) {
+			} else if names.Empty() && (obj.Exported() || t.includeUnexported) {
 				t.transpileObject(obj, t.modules[pkg.Name])
 			}
 		}
 	}
-	transpilePkg(t.primaryPkg, opts.PrimaryPackage)
+	transpile(t.primaryPkg, opts.PrimaryPackage.Names)
 	for i, pkg := range t.secondaryPkgs {
-		transpilePkg(pkg, opts.SecondaryPackages[i])
+		transpile(pkg, opts.SecondaryPackages[i].Names)
 	}
 	return t.modules, nil
 }
