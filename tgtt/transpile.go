@@ -59,11 +59,23 @@ func Transpile(opts TranspileOptions) (Package, error) {
 	for i, pkg := range t.secondaryPkgs {
 		transpile(pkg, opts.SecondaryPackages[i].Names)
 	}
+
+	if index := t.modules.Index(); index != nil {
+		for _, name := range opts.Include {
+			if name == "" || index.Imports.Has(name) {
+				continue
+			}
+			if module := t.modules[name]; module != nil {
+				index.Imports.Set(name, module)
+			}
+		}
+	}
 	return t.modules, nil
 }
 
 type TranspileOptions struct {
 	PrimaryPackage    PackageOptions
+	Include           []string
 	SecondaryPackages []PackageOptions
 	TypeMappings      map[string]string
 	IncludeUnexported bool
