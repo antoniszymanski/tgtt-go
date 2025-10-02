@@ -24,13 +24,9 @@ type transpiler struct {
 	fallbackType      string
 }
 
-func (t *transpiler) mainPkgs() []*packages.Package {
-	return append([]*packages.Package{t.primaryPkg}, t.secondaryPkgs...)
-}
-
 func (t *transpiler) init1() {
 	t.packages = make(map[string]*packages.Package)
-	stack := t.mainPkgs()
+	stack := append([]*packages.Package{t.primaryPkg}, t.secondaryPkgs...)
 	for len(stack) > 0 {
 		current := stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
@@ -89,21 +85,21 @@ func (t *transpiler) init2() {
 }
 
 func (t *transpiler) init3() {
-	mainPkgs := t.mainPkgs()
-	t.modules = make(Package, len(mainPkgs))
-	for _, pkg := range mainPkgs {
-		t.addModule(pkg.Name, pkg.PkgPath)
+	t.modules = make(Package, 1+len(t.secondaryPkgs))
+	t.addModule(t.primaryPkg)
+	for _, pkg := range t.secondaryPkgs {
+		t.addModule(pkg)
 	}
 }
 
-func (t *transpiler) addModule(name, goPath string) *Module {
-	mod := &Module{
-		GoPath:  goPath,
+func (t *transpiler) addModule(pkg *packages.Package) *Module {
+	module := &Module{
+		GoPath:  pkg.PkgPath,
 		Imports: orderedmap.NewOrderedMap[string, *Module](),
 		Defs:    orderedmap.NewOrderedMap[string, string](),
 	}
-	t.modules[name] = mod
-	return mod
+	t.modules[pkg.Name] = module
+	return module
 }
 
 func (t *transpiler) init4() {

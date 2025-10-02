@@ -20,7 +20,7 @@ func (t *transpiler) transpileTypeRef(dst []byte, tname *types.TypeName, mod *Mo
 	pkg := t.packages[tname.Pkg().Path()]
 	typeMod := t.modules[pkg.Name]
 	if typeMod == nil {
-		typeMod = t.addModule(pkg.Name, pkg.PkgPath)
+		typeMod = t.addModule(pkg)
 	}
 
 	for _, obj := range sortedDefs(pkg) {
