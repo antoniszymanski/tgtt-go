@@ -97,12 +97,12 @@ func sortedDefs(pkg *packages.Package) []types.Object {
 	slices.SortFunc(
 		defs,
 		func(a, b types.Object) int {
-			aPos := pkg.Fset.Position(a.Pos())
-			bPos := pkg.Fset.Position(b.Pos())
-			if c := strings.Compare(aPos.Filename, bPos.Filename); c != 0 {
+			posA := pkg.Fset.Position(a.Pos())
+			posB := pkg.Fset.Position(b.Pos())
+			if c := strings.Compare(posA.Filename, posB.Filename); c != 0 {
 				return c
 			}
-			return cmp.Compare(aPos.Line, bPos.Line)
+			return cmp.Compare(posA.Line, posB.Line)
 		},
 	)
 	return defs
