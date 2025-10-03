@@ -14,6 +14,20 @@ func (p Package) Index() *Module {
 	return p["index"]
 }
 
+func (p Package) builtin() *Module {
+	if module, ok := p["$builtin"]; ok {
+		return module
+	}
+	module := &Module{
+		GoPath:  "builtin",
+		Imports: orderedmap.NewOrderedMap[string, *Module](),
+		Defs:    orderedmap.NewOrderedMap[string, string](),
+	}
+	module.Defs.Set("comparable", "export type comparable = boolean | number | string | null | comparable[] | { [key: string]: comparable }")
+	p["$builtin"] = module
+	return module
+}
+
 type RenderOptions struct {
 	Limit int
 	Write func(moduleName string, data []byte) error

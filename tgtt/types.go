@@ -9,7 +9,8 @@ func (t *transpiler) transpileTypeRef(dst []byte, tname *types.TypeName, mod *Mo
 	if tname.Pkg() == nil {
 		switch tname.Name() {
 		case "comparable":
-			return append(dst, "string | number /* comparable */"...)
+			mod.Imports.Set("$builtin", t.modules.builtin())
+			return append(dst, "$builtin.comparable"...)
 		case "error":
 			return append(dst, "any /* error */"...)
 		default:
