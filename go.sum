@@ -10,8 +10,8 @@ github.com/alecthomas/kong v1.12.1 h1:iq6aMJDcFYP9uFrLdsiZQ2ZMmcshduyGv4Pek0MQPW
 github.com/alecthomas/kong v1.12.1/go.mod h1:p2vqieVMeTAnaC83txKtXe8FLke2X07aruPWXyMPQrU=
 github.com/alecthomas/repr v0.4.0 h1:GhI2A8MACjfegCPVq9f1FLvIBS+DrQ2KQBFZP1iFzXc=
 github.com/alecthomas/repr v0.4.0/go.mod h1:Fr0507jx4eOXV7AlPV6AVZLYrLIuIeSOWtW57eE/O/4=
-github.com/antoniszymanski/collections-go v0.1.0 h1:IlQw/P+KNskUkg2LVWQTNcAm3zfxeKcGWAV81m7rNqM=
-github.com/antoniszymanski/collections-go v0.1.0/go.mod h1:WbZdykThY+Fj7beBATQ2jEZmiQg+F31ItW+9qwc0F8c=
+github.com/antoniszymanski/collections-go v0.2.0 h1:aF92W5JTC6PzOLsW3UEDhQ9a4crFaoDqmS94BsvS0fs=
+github.com/antoniszymanski/collections-go v0.2.0/go.mod h1:WbZdykThY+Fj7beBATQ2jEZmiQg+F31ItW+9qwc0F8c=
 github.com/antoniszymanski/loadpackage-go v0.1.1 h1:2B9hmWi5jZofMYyZbTDi5BV/dGAKPjm9abiSm3jMqDY=
 github.com/antoniszymanski/loadpackage-go v0.1.1/go.mod h1:oZ5Ixl4KXvYqhFFFhtbdAULGIy9oNfqLUQaL4fmXvec=
 github.com/antoniszymanski/sanefmt-go v0.2.3 h1:n4CUvUNbqVyvtKxge0WRIRHv6ZuowY/gANPFBbANM+I=
