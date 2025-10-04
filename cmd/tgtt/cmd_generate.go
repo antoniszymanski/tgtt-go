@@ -43,7 +43,6 @@ func (c *cmdGenerate) Run() error {
 
 	pkg, err := tgtt.Transpile(tgtt.TranspileOptions{
 		PrimaryPackage:    cfg.PrimaryPackage,
-		Include:           cfg.Include,
 		SecondaryPackages: cfg.SecondaryPackages,
 		TypeMappings:      cfg.TypeMappings,
 		IncludeUnexported: cfg.IncludeUnexported,
