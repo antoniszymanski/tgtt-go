@@ -29,7 +29,6 @@ func Transpile(opts TranspileOptions) (Package, error) {
 		Mode: packages.NeedName |
 			packages.NeedImports |
 			packages.NeedDeps |
-			packages.NeedTypes |
 			packages.NeedTypesInfo,
 	}
 	var err error
