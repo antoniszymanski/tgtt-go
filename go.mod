@@ -1,6 +1,6 @@
 module github.com/antoniszymanski/tgtt-go
 
-go 1.24.6
+go 1.24.8
 
 require (
 	github.com/DisposaBoy/JsonConfigReader v0.0.0-20201129172854-99cf318d67e7
