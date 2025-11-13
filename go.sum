@@ -12,8 +12,8 @@ github.com/alecthomas/repr v0.4.0 h1:GhI2A8MACjfegCPVq9f1FLvIBS+DrQ2KQBFZP1iFzXc
 github.com/alecthomas/repr v0.4.0/go.mod h1:Fr0507jx4eOXV7AlPV6AVZLYrLIuIeSOWtW57eE/O/4=
 github.com/antoniszymanski/collections-go v0.2.0 h1:aF92W5JTC6PzOLsW3UEDhQ9a4crFaoDqmS94BsvS0fs=
 github.com/antoniszymanski/collections-go v0.2.0/go.mod h1:WbZdykThY+Fj7beBATQ2jEZmiQg+F31ItW+9qwc0F8c=
-github.com/antoniszymanski/loadpackage-go v0.1.2 h1:TqXUMYQ9emGQ65taUlil2ovGlAKrssx4PshvkjJGEKQ=
-github.com/antoniszymanski/loadpackage-go v0.1.2/go.mod h1:WYBT52sAZsJLwhmZ+wm5anWPVblgXbhpdk4Awf3MWjQ=
+github.com/antoniszymanski/loadpackage-go v0.1.3 h1:p1721/Wzs7S72bix536KxOEsQYtRHeVh9IVhfinkh/w=
+github.com/antoniszymanski/loadpackage-go v0.1.3/go.mod h1:UEK2/nQChc0AndvqIc390Fql/j7KTlyuv4bIfVdojHQ=
 github.com/antoniszymanski/sanefmt-go v0.2.4 h1:6HPzraVLmZTL318xR3SXiuyDZEWny7cenetQfnIAk1Y=
 github.com/antoniszymanski/sanefmt-go v0.2.4/go.mod h1:p2UWbRSTT7V2q6G6pD+1TDRz6PdIlMsGduRsYSGiQ4k=
 github.com/bahlo/generic-list-go v0.2.0 h1:5sz/EEAK+ls5wF+NeqDpk5+iNdMDXrh3z3nPnH1Wvgk=
