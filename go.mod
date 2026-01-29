@@ -6,7 +6,7 @@ require (
 	github.com/DisposaBoy/JsonConfigReader v0.0.0-20201129172854-99cf318d67e7
 	github.com/alecthomas/kong v1.13.0
 	github.com/antoniszymanski/collections-go v0.2.0
-	github.com/antoniszymanski/loadpackage-go v0.1.3
+	github.com/antoniszymanski/loadpackage-go v0.1.4
 	github.com/antoniszymanski/sanefmt-go v0.2.4
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/fatih/structtag v1.2.0
