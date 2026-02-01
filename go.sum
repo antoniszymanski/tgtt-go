@@ -14,8 +14,8 @@ github.com/antoniszymanski/collections-go v0.2.0 h1:aF92W5JTC6PzOLsW3UEDhQ9a4crF
 github.com/antoniszymanski/collections-go v0.2.0/go.mod h1:WbZdykThY+Fj7beBATQ2jEZmiQg+F31ItW+9qwc0F8c=
 github.com/antoniszymanski/loadpackage-go v0.1.4 h1:sanjYkGmjWMBUN9K/qsmg4EqjCvPpR7XPr//sgnwBfQ=
 github.com/antoniszymanski/loadpackage-go v0.1.4/go.mod h1:ZX6UKREvEjB98E3AEN/1e+mbtdmL/M9sQFgrXLypqcs=
-github.com/antoniszymanski/sanefmt-go v0.2.4 h1:6HPzraVLmZTL318xR3SXiuyDZEWny7cenetQfnIAk1Y=
-github.com/antoniszymanski/sanefmt-go v0.2.4/go.mod h1:p2UWbRSTT7V2q6G6pD+1TDRz6PdIlMsGduRsYSGiQ4k=
+github.com/antoniszymanski/sanefmt-go v0.3.1 h1:z/iPIRIwXg9TEr+Jm1pARaMGUyvetWo3YtHoZ+9Prj8=
+github.com/antoniszymanski/sanefmt-go v0.3.1/go.mod h1:deevbLBhKOPNkaQTBir6B9XLZhfHBZyQbHs1Iu5DC+0=
 github.com/bahlo/generic-list-go v0.2.0 h1:5sz/EEAK+ls5wF+NeqDpk5+iNdMDXrh3z3nPnH1Wvgk=
 github.com/bahlo/generic-list-go v0.2.0/go.mod h1:2KvAjgMlE5NNynlg/5iLrrCCZ2+5xWbdbCW3pNTGyYg=
 github.com/buger/jsonparser v1.1.1 h1:2PnMjfWD7wBILjqQbt530v576A/cAbQvEW9gGIpYMUs=
@@ -43,8 +43,8 @@ github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 h1:KRzFb2m7YtdldCEkzs6KqmJw4nqEV
 github.com/santhosh-tekuri/jsonschema/v6 v6.0.2/go.mod h1:JXeL+ps8p7/KNMjDQk3TCwPpBy0wYklyWTfbkIzdIFU=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/tetratelabs/wazero v1.10.1 h1:2DugeJf6VVk58KTPszlNfeeN8AhhpwcZqkJj2wwFuH8=
-github.com/tetratelabs/wazero v1.10.1/go.mod h1:DRm5twOQ5Gr1AoEdSi0CLjDQF1J9ZAuyqFIjl1KKfQU=
+github.com/tetratelabs/wazero v1.11.0 h1:+gKemEuKCTevU4d7ZTzlsvgd1uaToIDtlQlmNbwqYhA=
+github.com/tetratelabs/wazero v1.11.0/go.mod h1:eV28rsN8Q+xwjogd7f4/Pp4xFxO7uOGbLcD/LzB1wiU=
 github.com/wk8/go-ordered-map/v2 v2.1.8 h1:5h/BUHu93oj4gIdvHHHGsScSTMijfx5PeYkE/fJgbpc=
 github.com/wk8/go-ordered-map/v2 v2.1.8/go.mod h1:5nJHM5DyteebpVlHnWMV0rPz6Zp7+xBAnxjb1X5vnTw=
 golang.org/x/mod v0.32.0 h1:9F4d3PHLljb6x//jOyokMv3eX+YDeepZSEo3mFJy93c=
