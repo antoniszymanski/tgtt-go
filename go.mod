@@ -4,7 +4,7 @@ go 1.24.8
 
 require (
 	github.com/DisposaBoy/JsonConfigReader v0.0.0-20201129172854-99cf318d67e7
-	github.com/alecthomas/kong v1.13.0
+	github.com/alecthomas/kong v1.14.0
 	github.com/antoniszymanski/collections-go v0.2.0
 	github.com/antoniszymanski/loadpackage-go v0.1.4
 	github.com/antoniszymanski/sanefmt-go v0.3.1
