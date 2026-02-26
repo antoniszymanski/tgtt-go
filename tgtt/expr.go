@@ -60,14 +60,14 @@ func transpileArrayType(dst []byte, expr *ast.ArrayType) ([]byte, error) {
 }
 
 func transpileBadExpr(_ []byte, expr *ast.BadExpr) ([]byte, error) {
-	return nil, &ErrBadExpr{From: expr.From, To: expr.To}
+	return nil, &BadExprError{From: expr.From, To: expr.To}
 }
 
-type ErrBadExpr struct {
+type BadExprError struct {
 	From, To token.Pos
 }
 
-func (e *ErrBadExpr) Error() string {
+func (e *BadExprError) Error() string {
 	return fmt.Sprintf("BadExpr: syntax error found at position %d to %d", e.From, e.To)
 }
 
