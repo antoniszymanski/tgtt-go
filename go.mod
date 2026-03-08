@@ -1,6 +1,6 @@
 module github.com/antoniszymanski/tgtt-go
 
-go 1.24.8
+go 1.25.0
 
 require (
 	github.com/DisposaBoy/JsonConfigReader v0.0.0-20201129172854-99cf318d67e7
@@ -12,7 +12,7 @@ require (
 	github.com/fatih/structtag v1.2.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
-	golang.org/x/sync v0.19.0
+	golang.org/x/sync v0.20.0
 	golang.org/x/tools v0.42.0
 )
 
