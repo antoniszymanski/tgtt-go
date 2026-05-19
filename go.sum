@@ -1,7 +1,7 @@
-codeberg.org/msantos/embedexe v0.0.0-20250421111610-c1538c66a2a1 h1:kNgh5czOvrBtHD81ir3HrleBumsuCdjTU6LOeZNBpG4=
-codeberg.org/msantos/embedexe v0.0.0-20250421111610-c1538c66a2a1/go.mod h1:ipqSRAomnausawEF799WqXRHS6GzorCo7MN//9DC9+0=
-codeberg.org/msantos/execve v0.0.0-20230206112018-e5c3a7f4d436 h1:JfctQYg/vUC3LpnjGeNTDI/JSenwfeshld2kUjjR2+0=
-codeberg.org/msantos/execve v0.0.0-20230206112018-e5c3a7f4d436/go.mod h1:mvAmIdjLHiBlHQXtcPhQycOi0QuCAbw8dxOXxk0gYaE=
+codeberg.org/msantos/embedexe v0.0.0-20260307132226-e998067a7cec h1:nvUDW1kkBDYRfDZJWkPGdhEWLyJV/hUvdo7kdavBTVg=
+codeberg.org/msantos/embedexe v0.0.0-20260307132226-e998067a7cec/go.mod h1:qJjzXtdbTUmGEwzlqBaGkEf8Hv01zgcjsLdgzBY7D1Y=
+codeberg.org/msantos/execve v0.0.0-20260304121057-b54800594909 h1:DHEL9imuBsem608GZHq3aEl26w+8wV8z/5sic4U/EQU=
+codeberg.org/msantos/execve v0.0.0-20260304121057-b54800594909/go.mod h1:anSar/XoY88y7ikIgjmWcFmO/sGJ0lEQ141ERPl+8uo=
 github.com/DisposaBoy/JsonConfigReader v0.0.0-20201129172854-99cf318d67e7 h1:AJKJCKcb/psppPl/9CUiQQnTG+Bce0/cIweD5w5Q7aQ=
 github.com/DisposaBoy/JsonConfigReader v0.0.0-20201129172854-99cf318d67e7/go.mod h1:GCzqZQHydohgVLSIqRKZeTt8IGb1Y4NaFfim3H40uUI=
 github.com/alecthomas/assert/v2 v2.11.0 h1:2Q9r3ki8+JYXvGsDyBXwH3LcJ+WK5D0gc5E8vS6K3D0=
@@ -14,8 +14,8 @@ github.com/antoniszymanski/collections-go v0.2.0 h1:aF92W5JTC6PzOLsW3UEDhQ9a4crF
 github.com/antoniszymanski/collections-go v0.2.0/go.mod h1:WbZdykThY+Fj7beBATQ2jEZmiQg+F31ItW+9qwc0F8c=
 github.com/antoniszymanski/loadpackage-go v0.1.7 h1:bNgbByJ0TRm2l/u64OyZqZ9IUVK/PodgCwQonIxaLj0=
 github.com/antoniszymanski/loadpackage-go v0.1.7/go.mod h1:smcOxvxr+fX1sPwvVagXVCwpyDBCY3TXh3f8QsyAPhY=
-github.com/antoniszymanski/sanefmt-go v0.3.1 h1:z/iPIRIwXg9TEr+Jm1pARaMGUyvetWo3YtHoZ+9Prj8=
-github.com/antoniszymanski/sanefmt-go v0.3.1/go.mod h1:deevbLBhKOPNkaQTBir6B9XLZhfHBZyQbHs1Iu5DC+0=
+github.com/antoniszymanski/sanefmt-go v0.3.2 h1:zVvaFhKkOZuc/OttkXXep7f6rvqSKLh01PUOkJoI5QQ=
+github.com/antoniszymanski/sanefmt-go v0.3.2/go.mod h1:2E+zfKlPSvtFqwkNDG2eLM5TzH5HUgDmnU8MlJPMJrE=
 github.com/bahlo/generic-list-go v0.2.0 h1:5sz/EEAK+ls5wF+NeqDpk5+iNdMDXrh3z3nPnH1Wvgk=
 github.com/bahlo/generic-list-go v0.2.0/go.mod h1:2KvAjgMlE5NNynlg/5iLrrCCZ2+5xWbdbCW3pNTGyYg=
 github.com/buger/jsonparser v1.1.2 h1:frqHqw7otoVbk5M8LlE/L7HTnIq2v9RX6EJ48i9AxJk=

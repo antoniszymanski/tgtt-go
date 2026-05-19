@@ -7,7 +7,7 @@ require (
 	github.com/alecthomas/kong v1.15.0
 	github.com/antoniszymanski/collections-go v0.2.0
 	github.com/antoniszymanski/loadpackage-go v0.1.7
-	github.com/antoniszymanski/sanefmt-go v0.3.1
+	github.com/antoniszymanski/sanefmt-go v0.3.2
 	github.com/elliotchance/orderedmap/v3 v3.1.0
 	github.com/fatih/structtag v1.2.0
 	github.com/invopop/jsonschema v0.14.0
@@ -17,8 +17,8 @@ require (
 )
 
 require (
-	codeberg.org/msantos/embedexe v0.0.0-20250421111610-c1538c66a2a1 // indirect
-	codeberg.org/msantos/execve v0.0.0-20230206112018-e5c3a7f4d436 // indirect
+	codeberg.org/msantos/embedexe v0.0.0-20260307132226-e998067a7cec // indirect
+	codeberg.org/msantos/execve v0.0.0-20260304121057-b54800594909 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.2 // indirect
 	github.com/pb33f/ordered-map/v2 v2.3.1 // indirect
