@@ -8,7 +8,7 @@ require (
 	github.com/antoniszymanski/collections-go v0.2.0
 	github.com/antoniszymanski/loadpackage-go v0.1.7
 	github.com/antoniszymanski/sanefmt-go v0.3.2
-	github.com/elliotchance/orderedmap/v3 v3.1.0
+	github.com/elliotchance/orderedmap/v3 v3.1.1
 	github.com/fatih/structtag v1.2.0
 	github.com/invopop/jsonschema v0.14.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
